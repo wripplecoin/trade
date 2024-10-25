@@ -1,6 +1,9 @@
 import { userSingleHopAtom } from '@pancakeswap/utils/user'
 import { atom, useAtom, useAtomValue } from 'jotai'
+import { useResetAtom } from 'jotai/utils'
 import atomWithStorageWithErrorCatch from 'utils/atomWithStorageWithErrorCatch'
+import { usePCSX } from 'hooks/usePCSX'
+import { useCallback } from 'react'
 
 const userUseStableSwapAtom = atomWithStorageWithErrorCatch<boolean>('pcs:useStableSwap', true)
 const userUseV2SwapAtom = atomWithStorageWithErrorCatch<boolean>('pcs:useV2Swap', true)
@@ -9,7 +12,8 @@ const userUserSplitRouteAtom = atomWithStorageWithErrorCatch<boolean>('pcs:useSp
 const userUseXAtom = atomWithStorageWithErrorCatch<boolean | undefined>('pcs:useX', undefined)
 
 export function useUserXEnable() {
-  return useAtom(userUseXAtom)
+  const reset = useResetAtom(userUseXAtom)
+  return [...useAtom(userUseXAtom), reset] as const
 }
 
 export function useUserStableSwapEnable() {
@@ -56,5 +60,11 @@ const derivedRoutingSettingChangedAtom = atom(
 )
 
 export function useRoutingSettingChanged() {
-  return useAtom(derivedRoutingSettingChangedAtom)
+  const [enabled, _, featureEnabled, resetX] = usePCSX()
+  const [derivedRoutingSettingChanged, reset] = useAtom(derivedRoutingSettingChangedAtom)
+  const resetRoutingSettings = useCallback(() => {
+    reset()
+    resetX()
+  }, [reset, resetX])
+  return [derivedRoutingSettingChanged || enabled !== featureEnabled, resetRoutingSettings] as const
 }

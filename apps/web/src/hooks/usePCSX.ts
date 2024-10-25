@@ -2,7 +2,7 @@ import { ChainId } from '@pancakeswap/chains'
 import { EXPERIMENTAL_FEATURES } from 'config/experimentalFeatures'
 import { SUPPORTED_CHAINS } from 'config/pcsx'
 import { useExperimentalFeatureEnabled } from 'hooks/useExperimentalFeatureEnabled'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useUserXEnable } from 'state/user/smartRouter'
 
 export function usePCSXFeatureEnabled() {
@@ -11,10 +11,15 @@ export function usePCSXFeatureEnabled() {
 
 export const usePCSX = () => {
   const featureEnabled = usePCSXFeatureEnabled()
-  const [xEnabled, setX] = useUserXEnable()
+  const [xEnabled, setX, reset] = useUserXEnable()
   const enabled = Boolean(xEnabled ?? featureEnabled)
-
-  return [enabled, setX] as const
+  const setUserX = useCallback(
+    (updater: boolean | ((current: boolean) => boolean)) => {
+      setX(typeof updater === 'function' ? updater(enabled) : updater)
+    },
+    [enabled],
+  )
+  return [enabled, setUserX, featureEnabled, reset] as const
 }
 
 export function usePCSXEnabledOnChain(chainId?: ChainId) {
