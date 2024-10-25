@@ -75,7 +75,7 @@ export function useAccountBalances<TData = unknown>({
   const v2Balances = coinsData?.[1]
   const v1AssetsTypes = useV1CoinAssetTypes({
     networkName,
-    assetTypes: v2Balances?.map((b) => b.asset_type) || [],
+    assetTypes: v2Balances?.map((b) => b.asset_type).filter((b): b is string => typeof b === 'string') || [],
     enabled: Boolean(isSuccess && v2Balances?.length),
   })
   const { isFetched, data: mappedV2Balances } = useMemo(() => {
@@ -108,6 +108,7 @@ export function useAccountBalances<TData = unknown>({
     for (const b of allBalances) {
       if (!b) continue
       const id = b.asset_type
+      if (typeof id !== 'string') continue
       const amount = assetTypeToBalance.get(id) || 0
       assetTypeToBalance.set(id, amount + b.amount)
     }

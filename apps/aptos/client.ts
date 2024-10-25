@@ -7,11 +7,12 @@ import { PetraConnector } from '@pancakeswap/awgmi/connectors/petra'
 import { PontemConnector } from '@pancakeswap/awgmi/connectors/pontem'
 import { RiseConnector } from '@pancakeswap/awgmi/connectors/rise'
 import { SafePalConnector } from '@pancakeswap/awgmi/connectors/safePal'
-import { Aptos, AptosConfig, NetworkToNetworkName } from '@aptos-labs/ts-sdk'
+import { Aptos, AptosConfig, Network, NetworkToNetworkName } from '@aptos-labs/ts-sdk'
 import { chains, defaultChain } from 'config/chains'
 
 const NODE_REAL_API = process.env.NEXT_PUBLIC_NODE_REAL_API
 const NODE_REAL_API_TESTNET = process.env.NEXT_PUBLIC_NODE_REAL_API_TESTNET
+const APTOS_GATEWAY_API_KEY = process.env.NEXT_PUBLIC_APTOS_GATEWAY_API_KEY
 
 const nodeReal = {
   ...(NODE_REAL_API && {
@@ -39,13 +40,21 @@ export const client = createClient({
   ],
   provider: ({ networkName }) => {
     const networkNameLowerCase = networkName?.toLowerCase()
+    const network = NetworkToNetworkName[networkNameLowerCase ?? defaultChain.network.toLowerCase()]
+    const clientConfig =
+      network === Network.MAINNET
+        ? {
+            API_KEY: APTOS_GATEWAY_API_KEY,
+          }
+        : undefined
+
     if (networkNameLowerCase) {
       const foundChain = chains.find((c) => c.network === networkNameLowerCase)
       if (foundChain) {
         if (foundChain.nodeUrls.nodeReal && nodeReal[networkNameLowerCase]) {
           return new Aptos(
             new AptosConfig({
-              network: NetworkToNetworkName[networkNameLowerCase],
+              network,
               fullnode: `${foundChain.nodeUrls.nodeReal}/${nodeReal[networkNameLowerCase]}/v1`,
               clientConfig: {
                 WITH_CREDENTIALS: false,
@@ -55,7 +64,8 @@ export const client = createClient({
         }
         return new Aptos(
           new AptosConfig({
-            network: NetworkToNetworkName[networkNameLowerCase],
+            network,
+            clientConfig,
           }),
         )
       }
@@ -63,8 +73,9 @@ export const client = createClient({
 
     return new Aptos(
       new AptosConfig({
-        network: NetworkToNetworkName[defaultChain.network.toLowerCase()],
+        network,
         fullnode: defaultChain.nodeUrls.default,
+        clientConfig,
       }),
     )
   },
