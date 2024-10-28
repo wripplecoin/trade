@@ -1,8 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { ChainId } from '@pancakeswap/chains'
 import { type Address, zeroAddress } from 'viem'
-import { ERC20Token } from '@pancakeswap/sdk'
-import { Currency, NativeCurrency } from '@pancakeswap/swap-sdk-core'
+import { ERC20Token, Currency, NativeCurrency, Token } from '@pancakeswap/sdk'
 
 import { TokenAddressMap } from '@pancakeswap/token-lists'
 import { useReadContracts } from '@pancakeswap/wagmi'
@@ -19,6 +18,8 @@ import {
 } from 'state/lists/hooks'
 import { safeGetAddress } from 'utils'
 import { erc20Abi } from 'viem'
+import memoize from 'lodash/memoize'
+import uniqueId from 'lodash/uniqueId'
 import useUserAddedTokens, { useUserAddedTokensByChainIds } from '../state/user/hooks/useUserAddedTokens'
 import { useActiveChainId } from './useActiveChainId'
 import useNativeCurrency from './useNativeCurrency'
@@ -80,9 +81,14 @@ export type TokenChainAddressMap<TChainId extends number = number> = {
   }
 }
 
-export function useTokensByChainIds(chainIds: number[], tokenMap: TokenAddressMap<ChainId>): TokenChainAddressMap {
-  const userAddedTokenMap = useUserAddedTokensByChainIds(chainIds)
-  return useMemo(() => {
+const tokenMapCache = new WeakMap<TokenAddressMap<ChainId>, string>()
+
+const memoizedTokenMap = memoize(
+  (
+    chainIds: ChainId[],
+    tokenMap: TokenAddressMap<ChainId>,
+    userAddedTokenMap: { [p: number]: Token[] },
+  ): TokenChainAddressMap => {
     return chainIds.reduce<TokenChainAddressMap>((tokenMap_, chainId) => {
       tokenMap_[chainId] = tokenMap_[chainId] || {}
       userAddedTokenMap[chainId].forEach((token) => {
@@ -100,7 +106,29 @@ export function useTokensByChainIds(chainIds: number[], tokenMap: TokenAddressMa
 
       return tokenMap_
     }, {})
-  }, [userAddedTokenMap, tokenMap, chainIds])
+  },
+  (chainIds, tokenMap, userAddedTokenMap) => {
+    let tokenMapId = tokenMapCache.get(tokenMap)
+    if (!tokenMapId) {
+      tokenMapId = uniqueId()
+      tokenMapCache.set(tokenMap, tokenMapId)
+    }
+    const chainIdsKey = chainIds.join(',')
+    // User-added tokens are small and contain only the token; stringify can be used.
+    const userAddedTokenMapKey = JSON.stringify(
+      Object.keys(userAddedTokenMap).reduce((acc, chainId) => {
+        acc[chainId] = userAddedTokenMap[chainId].map((token) => token.address || '')
+        return acc
+      }, {} as { [p: number]: string[] }),
+    )
+    return `${chainIdsKey}:${tokenMapId}:${userAddedTokenMapKey}`
+  },
+)
+
+export function useTokensByChainIds(chainIds: number[], tokenMap: TokenAddressMap<ChainId>): TokenChainAddressMap {
+  const userAddedTokenMap = useUserAddedTokensByChainIds(chainIds)
+
+  return memoizedTokenMap(chainIds, tokenMap, userAddedTokenMap)
 }
 
 /**
