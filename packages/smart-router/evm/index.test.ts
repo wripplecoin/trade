@@ -40,6 +40,7 @@ test('exports', () => {
       "SwapRouter",
       "PoolType",
       "RouteType",
+      "V4MixedQuoterActions",
       "V4Router",
     ]
   `)
@@ -54,6 +55,7 @@ test('SmartRouter exports', () => {
       "getV2PoolsOnChain",
       "getStablePoolsOnChain",
       "getV3PoolsWithoutTicksOnChain",
+      "createOnChainPoolFactory",
       "getV3PoolSubgraph",
       "getV2PoolSubgraph",
       "getAllV3PoolsFromSubgraph",
@@ -94,6 +96,8 @@ test('SmartRouter exports', () => {
       "isV2Pool",
       "isV3Pool",
       "isStablePool",
+      "isV4ClPool",
+      "isV4BinPool",
       "getMidPrice",
       "involvesCurrency",
       "encodeMixedRouteToPath",

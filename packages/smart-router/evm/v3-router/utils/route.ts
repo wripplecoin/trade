@@ -5,7 +5,7 @@ import { BaseRoute, Pool, RouteType, PoolType, Route } from '../types'
 import { getOutputCurrency, getTokenPrice } from './pool'
 
 export function buildBaseRoute(pools: Pool[], currencyIn: Currency, currencyOut: Currency): BaseRoute {
-  const path: Currency[] = [currencyIn.wrapped]
+  const path: Currency[] = [currencyIn]
   let prevIn = path[0]
   let routeType: RouteType | null = null
   const updateRouteType = (pool: Pool, currentRouteType: RouteType | null) => {
@@ -17,10 +17,15 @@ export function buildBaseRoute(pools: Pool[], currencyIn: Currency, currencyOut:
     }
     return currentRouteType
   }
+  const lastPool = pools[pools.length - 1]
   for (const pool of pools) {
+    routeType = updateRouteType(pool, routeType)
+    if (pool === lastPool) {
+      path.push(currencyOut)
+      continue
+    }
     prevIn = getOutputCurrency(pool, prevIn)
     path.push(prevIn)
-    routeType = updateRouteType(pool, routeType)
   }
 
   if (routeType === null) {
@@ -44,6 +49,10 @@ function getRouteTypeFromPool(pool: Pick<Pool, 'type'>) {
       return RouteType.V3
     case PoolType.STABLE:
       return RouteType.STABLE
+    case PoolType.V4CL:
+      return RouteType.V4CL
+    case PoolType.V4BIN:
+      return RouteType.V4BIN
     default:
       return RouteType.MIXED
   }
@@ -69,13 +78,19 @@ export function getQuoteCurrency({ input, output }: BaseRoute, baseCurrency: Cur
   return baseCurrency.equals(input) ? output : input
 }
 
+function wrapPrice(price: Price<Currency, Currency>): Price<Currency, Currency> {
+  return new Price(price.baseCurrency.wrapped, price.quoteCurrency.wrapped, price.denominator, price.numerator)
+}
+
 export function getMidPrice({ path, pools }: Pick<Route, 'path' | 'pools'>) {
   let i = 0
   let price: Price<Currency, Currency> | null = null
+  const currencyIn = path[0]
+  const currencyOut = path[path.length - 1]
   for (const pool of pools) {
-    const input = path[i].wrapped
-    const output = path[i + 1].wrapped
-    const poolPrice = getTokenPrice(pool, input, output)
+    const input = path[i]
+    const output = path[i + 1]
+    const poolPrice = wrapPrice(getTokenPrice(pool, input, output))
 
     price = price ? price.multiply(poolPrice) : poolPrice
     i += 1
@@ -84,5 +99,5 @@ export function getMidPrice({ path, pools }: Pick<Route, 'path' | 'pools'>) {
   if (!price) {
     throw new Error('Get mid price failed')
   }
-  return price
+  return new Price(currencyIn, currencyOut, price.denominator, price.numerator)
 }

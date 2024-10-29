@@ -73,6 +73,14 @@ export class PancakeSwapTrade implements Command {
         addStableSwap(planner, singleRouteTrade, this.options, routerMustCustody, payerIsUser)
         continue
       }
+      if (route.type === RouteType.V4CL) {
+        // TODO: implementation
+        continue
+      }
+      if (route.type === RouteType.V4BIN) {
+        // TODO: implementation
+        continue
+      }
       addMixedSwap(planner, singleRouteTrade, this.options, payerIsUser, routerMustCustody)
     }
 
