@@ -1,5 +1,12 @@
 # @pancakeswap/swap-sdk-core
 
+## 1.3.0
+
+### Minor Changes
+
+- 176eb10: Add currency address getter
+- 176eb10: Support price wrapping
+
 ## 1.2.0
 
 ### Minor Changes

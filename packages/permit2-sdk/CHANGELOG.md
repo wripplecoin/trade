@@ -1,5 +1,11 @@
 # @pancakeswap/permit2-sdk
 
+## 1.0.11
+
+### Patch Changes
+
+- @pancakeswap/sdk@5.8.9
+
 ## 1.0.10
 
 ### Patch Changes

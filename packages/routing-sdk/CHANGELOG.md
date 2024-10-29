@@ -1,5 +1,15 @@
 # @pancakeswap/routing-sdk
 
+## 0.2.2
+
+### Patch Changes
+
+- ffa96b3: Add support for native token pools
+- Updated dependencies [176eb10]
+- Updated dependencies [176eb10]
+  - @pancakeswap/swap-sdk-core@1.3.0
+  - @pancakeswap/swap-sdk-evm@1.0.6
+
 ## 0.2.1
 
 ### Patch Changes

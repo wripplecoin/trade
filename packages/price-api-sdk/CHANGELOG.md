@@ -1,5 +1,23 @@
 # @pancakeswap/price-api-sdk
 
+## 5.0.0
+
+### Minor Changes
+
+- 176eb10: Add v4 pool types
+- 176eb10: Introduce v4 liquidity pools
+
+### Patch Changes
+
+- Updated dependencies [176eb10]
+- Updated dependencies [176eb10]
+- Updated dependencies [176eb10]
+- Updated dependencies [176eb10]
+  - @pancakeswap/swap-sdk-core@1.3.0
+  - @pancakeswap/smart-router@6.2.0
+  - @pancakeswap/pcsx-sdk@1.0.1
+  - @pancakeswap/permit2-sdk@1.0.11
+
 ## 4.0.3
 
 ### Patch Changes

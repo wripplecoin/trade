@@ -1,5 +1,26 @@
 # @pancakeswap/smart-router
 
+## 6.2.0
+
+### Minor Changes
+
+- 176eb10: Add v4 pool types
+- 176eb10: Introduce v4 liquidity pools
+
+### Patch Changes
+
+- Updated dependencies [176eb10]
+- Updated dependencies [176eb10]
+  - @pancakeswap/swap-sdk-core@1.3.0
+  - @pancakeswap/stable-swap-sdk@1.1.4
+  - @pancakeswap/sdk@5.8.9
+  - @pancakeswap/token-lists@0.0.14
+  - @pancakeswap/v3-sdk@3.8.12
+  - @pancakeswap/v4-sdk@0.1.4
+  - @pancakeswap/gauges@2.0.2
+  - @pancakeswap/multicall@3.5.9
+  - @pancakeswap/tokens@0.6.28
+
 ## 6.1.6
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @pancakeswap/pools
 
+## 5.1.35
+
+### Patch Changes
+
+- @pancakeswap/token-lists@0.0.14
+- @pancakeswap/tokens@0.6.28
+
 ## 5.1.34
 
 ### Patch Changes
