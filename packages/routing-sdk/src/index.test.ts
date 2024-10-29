@@ -8,6 +8,8 @@ test('exports', () => {
       "getEdgeKey",
       "createGraph",
       "createPriceCalculator",
+      "getWrappedCurrencyKey",
+      "getVerticeKey",
       "findBestTrade",
       "findBestTradeByStreams",
       "isSameRoute",

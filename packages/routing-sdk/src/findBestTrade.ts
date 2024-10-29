@@ -1,5 +1,5 @@
 import { formatFraction } from '@pancakeswap/utils/formatFractions'
-import { Currency, CurrencyAmount, Fraction, TradeType } from '@pancakeswap/swap-sdk-core'
+import { Token, Currency, CurrencyAmount, Fraction, TradeType } from '@pancakeswap/swap-sdk-core'
 import invariant from 'tiny-invariant'
 
 import { PriceCalculator, createGraph, createPriceCalculator, getNeighbour } from './graph'
@@ -190,15 +190,15 @@ async function getBestTrade({
       {
         hops: number
         gasSpent?: bigint
-        bestAmount: CurrencyAmount<Currency>
-        bestQuote?: CurrencyAmount<Currency>
+        bestAmount: CurrencyAmount<Token>
+        bestQuote?: CurrencyAmount<Token>
         bestSource?: Edge
       }
     >()
     const processedVert = new Set<Vertice>()
     bestResult.set(start, {
       hops: 0,
-      bestAmount: amount,
+      bestAmount: amount.wrapped,
       gasSpent: 0n,
     })
     const nextVertList: Vertice[] = [start]
@@ -209,7 +209,7 @@ async function getBestTrade({
     const getGasSpent = (vert: Vertice) => bestResult.get(vert)?.gasSpent || 0n
     const getNextVert = () => {
       let vert: Vertice | undefined
-      let bestQuote: CurrencyAmount<Currency> | undefined
+      let bestQuote: CurrencyAmount<Token> | undefined
       let bestVertIndex: number | undefined
       for (const [i, vertice] of nextVertList.entries()) {
         const currentBestQuote = getBestQuote(vertice)
@@ -227,17 +227,18 @@ async function getBestTrade({
     }
     const getBestRoute = (vert: Vertice) => {
       const pools: Pool[] = []
-      const path: Currency[] = [vert.currency]
+      const path: Currency[] = [quoteCurrency]
       for (let v: Vertice | undefined = finish; getBestSource(v); v = getNeighbour(getBestSource(v)!, v)) {
         const bestSource = getBestSource(v)
         invariant(bestSource !== undefined, 'Invalid best source')
         const neighbour = getNeighbour(bestSource, v)
+        const nextCurrency = neighbour === start ? baseCurrency : neighbour.currency
         if (isExactIn) {
           pools.unshift(bestSource.pool)
-          path.unshift(neighbour?.currency)
+          path.unshift(nextCurrency)
         } else {
           pools.push(bestSource.pool)
-          path.push(neighbour?.currency)
+          path.push(nextCurrency)
         }
       }
 
@@ -319,7 +320,7 @@ async function getBestTrade({
           const quoteResult = e.pool.getQuote({
             amount: bestAmount,
             isExactIn,
-            quoteCurrency: e.vertice0.currency.wrapped.equals(bestAmount.currency.wrapped)
+            quoteCurrency: e.vertice0.currency.equals(bestAmount.currency.wrapped)
               ? e.vertice1.currency
               : e.vertice0.currency,
           })
@@ -336,7 +337,7 @@ async function getBestTrade({
             `Failed to get price, base ${v2.currency.symbol}, quote ${finish.currency.symbol}`,
           )
           const gasSpentInQuote = price.quote(gasPriceInV2.multiply(gasSpent))
-          const newQuote = adjustQuoteByGas(price.quote(quote), gasSpentInQuote)
+          const newQuote = adjustQuoteByGas(price.quote(quote.wrapped), gasSpentInQuote)
           // const newQuote = price.quote(quote);
           const bestSource = getBestSource(v2)
           const v2BestQuote = getBestQuote(v2)
@@ -352,9 +353,9 @@ async function getBestTrade({
             bestResult.set(v2, {
               hops: currentHop + 1,
               gasSpent,
-              bestAmount: quote,
+              bestAmount: quote.wrapped,
               bestSource: e,
-              bestQuote: newQuote,
+              bestQuote: newQuote.wrapped,
             })
           }
         } catch (_err) {
