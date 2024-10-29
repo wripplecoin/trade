@@ -6,9 +6,10 @@ import {
   UniversalFarmConfigV3,
 } from '@pancakeswap/farms'
 import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 
 export const useV3FarmAPI = (chainId: ChainId) => {
-  const { data: farms } = useQuery({
+  const { data } = useQuery({
     queryKey: ['fetch-v3-farm-api'],
     queryFn: async () => {
       if (chainId) {
@@ -23,7 +24,9 @@ export const useV3FarmAPI = (chainId: ChainId) => {
     refetchOnMount: false,
   })
 
+  const farms = useMemo(() => data ?? [], [data])
+
   return {
-    farms: farms ?? [],
+    farms,
   }
 }

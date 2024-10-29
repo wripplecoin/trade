@@ -139,9 +139,8 @@ export const getAccountV2LpDetails = async (
   const validLpTokens = lpTokens.filter((token) => token.chainId === chainId)
 
   const bCakeWrapperAddresses = await Promise.all(
-    validReserveTokens.map(async (tokens) => {
-      const lpAddress = getV2LiquidityToken(tokens).address
-      const bCakeWrapperAddress = await getBCakeWrapperAddress(lpAddress, chainId)
+    validLpTokens.map(async (tokens) => {
+      const bCakeWrapperAddress = await getBCakeWrapperAddress(tokens.address, chainId)
       return bCakeWrapperAddress
     }),
   )
