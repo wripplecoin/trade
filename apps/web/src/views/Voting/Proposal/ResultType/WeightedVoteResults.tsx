@@ -1,6 +1,7 @@
 import { useTranslation } from '@pancakeswap/localization'
 import { Box, Flex, Progress, Text } from '@pancakeswap/uikit'
 import { formatNumber } from '@pancakeswap/utils/formatBalance'
+import _mergeWith from 'lodash/mergeWith'
 import { useMemo } from 'react'
 import { WeightedVoteState } from 'views/Voting/Proposal/VoteType/types'
 import TextEllipsis from '../../components/TextEllipsis'
@@ -21,13 +22,7 @@ export const WeightedVoteResults: React.FC<WeightedVoteResultsProps> = ({ choice
 
   const percentageResults = useMemo(
     () =>
-      choicesVotes.reduce((acc, item) => {
-        Object.entries(item).forEach(([key, value]) => {
-          // eslint-disable-next-line no-param-reassign
-          acc[key] = (acc[key] || 0) + value
-        })
-        return acc
-      }, {}),
+      choicesVotes.reduce((acc, item) => _mergeWith(acc, item, (objValue, srcValue) => (objValue || 0) + srcValue), {}),
     [choicesVotes],
   )
 
