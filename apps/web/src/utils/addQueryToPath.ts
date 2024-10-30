@@ -5,9 +5,8 @@ export function addQueryToPath(path: string, queryParams: { [key: string]: strin
   Object.keys(queryParams).forEach((key) => {
     if (key === 'chain') {
       searchParams.delete('chainId')
-    } else {
-      searchParams.set(key, queryParams[key])
     }
+    searchParams.set(key, queryParams[key])
   })
 
   return `${pathname}?${searchParams.toString()}`
