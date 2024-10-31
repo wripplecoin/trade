@@ -14,6 +14,7 @@ import { MyPositions } from './MyPositions'
 import { PoolCharts } from './PoolCharts'
 import { PoolCurrencies } from './PoolCurrencies'
 import { PoolStatus } from './PoolStatus'
+import { PoolTvlWarning } from './PoolTvlWarning'
 import { Transactions } from './Transactions/Transactions'
 
 const Header = styled.div`
@@ -112,6 +113,7 @@ export const PoolInfo = () => {
         <PoolCurrencies poolInfo={poolInfo} />
       </AutoRow>
 
+      <PoolTvlWarning poolInfo={poolInfo} />
       <Grid gridGap="24px" gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 2fr']}>
         <PoolStatus poolInfo={poolInfo} />
         <PoolCharts poolInfo={poolInfo} />
