@@ -1,5 +1,4 @@
 import { ChainId, chainNames } from '@pancakeswap/chains'
-import { VAULTS_CONFIG_BY_CHAIN } from '@pancakeswap/position-managers'
 import { FACTORY_ADDRESS_MAP, Token, computePairAddress } from '@pancakeswap/sdk'
 import { DEPLOYER_ADDRESSES, computePoolAddress } from '@pancakeswap/v3-sdk'
 import groupBy from 'lodash/groupBy'
@@ -124,21 +123,5 @@ describe.skip('Gauges Config', async () => {
         expect(gauge.address).toBe(computedAddress)
       }
     })
-
-    if (gauge.type === GaugeType.ALM) {
-      const vaults = VAULTS_CONFIG_BY_CHAIN[Number(gauge.chainId) as keyof typeof VAULTS_CONFIG_BY_CHAIN]
-      const matchedVault = vaults.find((v) => v.vaultAddress === gauge.address)
-      // it(`${chainName} gid #${gauge.gid} ALM address ${gauge.address} should have already configured in position-managers`, () => {
-      //   expect(matchedVault).toBeDefined()
-      // })
-      it(`${chainName} gid #${gauge.gid} ALM address ${gauge.address} should have correct position manager name`, () => {
-        if (!matchedVault) {
-          expect(gauge.managerName).toBeDefined()
-        } else {
-          expect(matchedVault).toBeDefined()
-          expect(gauge.managerName).toBeUndefined()
-        }
-      })
-    }
   })
 })

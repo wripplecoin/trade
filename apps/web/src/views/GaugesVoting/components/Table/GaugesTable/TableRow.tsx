@@ -19,7 +19,7 @@ import { useHover } from 'hooks/useHover'
 import { memo, useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { Tooltips } from 'views/CakeStaking/components/Tooltips'
-import { getPositionManagerName } from 'views/GaugesVoting/utils'
+import { usePositionManagerName } from 'views/GaugesVoting/hooks/usePositionManagerName'
 import { feeTierPercent } from 'views/V3Info/utils'
 import { GaugeTokenImage } from '../../GaugeTokenImage'
 import { NetworkBadge } from '../../NetworkBadge'
@@ -61,6 +61,7 @@ const TableRowItem: React.FC<{
   style?: React.CSSProperties
 }> = ({ data, locked, totalGaugesWeight, selected, selectable, onSelect, style }) => {
   const { t } = useTranslation()
+  const { managerName } = usePositionManagerName(data)
 
   const maxCapPercent = useMemo(() => {
     return new Percent(data?.maxVoteCap, 10000)
@@ -114,9 +115,9 @@ const TableRowItem: React.FC<{
             </Text>
             {data.type === GaugeType.ALM ? (
               <Flex alignItems="center">
-                <PositionManagerLogo manager={getPositionManagerName(data)} />
+                <PositionManagerLogo manager={managerName} />
                 <Text fontSize={14} color="textSubtle">
-                  {getPositionManagerName(data)}
+                  {managerName}
                 </Text>
               </Flex>
             ) : null}
