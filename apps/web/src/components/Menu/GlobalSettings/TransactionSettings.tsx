@@ -1,7 +1,7 @@
 import { useTranslation } from '@pancakeswap/localization'
 import { Box, Button, Flex, FlexGap, Input, Message, QuestionHelper, Text } from '@pancakeswap/uikit'
 import { useUserSlippage } from '@pancakeswap/utils/user'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { escapeRegExp } from 'utils'
 
 import { VerticalDivider } from '@pancakeswap/widgets-internal'
@@ -73,12 +73,15 @@ const SlippageTabs = () => {
     slippageError = undefined
   }
 
-  let deadlineError: DeadlineError | undefined
-  if (deadlineInput !== '' && !deadlineInputIsValid) {
-    deadlineError = DeadlineError.InvalidInput
-  } else {
-    deadlineError = undefined
-  }
+  const [deadlineError, setDeadlineError] = useState<DeadlineError | undefined>()
+
+  useEffect(() => {
+    if (deadlineInput !== '' && !deadlineInputIsValid) {
+      setDeadlineError(DeadlineError.InvalidInput)
+    } else {
+      setDeadlineError(undefined)
+    }
+  }, [deadlineInput, deadlineInputIsValid])
 
   const parseCustomSlippage = (value: string) => {
     if (value === '' || inputRegex.test(escapeRegExp(value))) {
@@ -96,14 +99,12 @@ const SlippageTabs = () => {
   }
 
   const parseCustomDeadline = (value: string) => {
-    setDeadlineInput(value)
-
     try {
       const valueAsInt: number = Number.parseInt(value) * 60
       if (!Number.isNaN(valueAsInt) && valueAsInt > 60 && valueAsInt < THREE_DAYS_IN_SECONDS) {
         setTTL(valueAsInt)
       } else {
-        deadlineError = DeadlineError.InvalidInput
+        setDeadlineError(DeadlineError.InvalidInput)
       }
     } catch (error) {
       console.error(error)
@@ -245,6 +246,11 @@ const SlippageTabs = () => {
               value={deadlineInput}
               onChange={(event) => {
                 if (event.currentTarget.validity.valid) {
+                  setDeadlineInput(event.target.value)
+                }
+              }}
+              onBlur={(event) => {
+                if (event.currentTarget.validity.valid) {
                   parseCustomDeadline(event.target.value)
                 }
               }}
@@ -262,7 +268,10 @@ const SlippageTabs = () => {
             mt="3px"
             variant="text"
             scale="sm"
-            onClick={() => parseCustomDeadline(DEFAULT_TXN_DEADLINE.toString())}
+            onClick={() => {
+              setDeadlineInput('')
+              parseCustomDeadline(DEFAULT_TXN_DEADLINE.toString())
+            }}
           >
             {t('Reset')}
           </PrimaryOutlineButton>
