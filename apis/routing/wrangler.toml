@@ -8,8 +8,6 @@ r2_buckets = [
 main = "src/index.ts"
 name = "routing-dev"
 node_compat = true
-[triggers]
-crons = ["0 0 * * *"]
 
 [env.production]
 kv_namespaces = [
@@ -19,7 +17,6 @@ r2_buckets = [
   { binding = "SUBGRAPH_POOLS", bucket_name = "subgraph-pools", preview_bucket_name = "subgraph-pools-dev" }
 ]
 name = "routing"
-[env.production.triggers]
 
 # The necessary secrets are:
 # - ETH_NODE
