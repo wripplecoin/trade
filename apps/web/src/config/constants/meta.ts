@@ -64,6 +64,10 @@ const getPathList = (t: ContextApi['t']): PathList => {
       '/profile': { basePath: true, title: t('Profile') },
       '/pancake-squad': { basePath: true, title: t('Pancake Squad') },
       '/pottery': { basePath: true, title: t('Pottery'), image: `${ASSET_CDN}/web/og/pottery.jpg` },
+      '/position-manager': { basePath: true, title: t('Position Manager') },
+      '/cake-staking': { basePath: true, title: t('CAKE Staking') },
+      '/buy-crypto': { basePath: true, title: t('Buy Crypto') },
+      '/gauges-voting': { basePath: true, title: t('Gauges Voting') },
     },
     defaultTitleSuffix: t('PancakeSwap'),
   }
@@ -84,5 +88,5 @@ export const getCustomMeta = memoize(
     }
     return null
   },
-  (path, t, locale) => `${path}#${locale}`,
+  (path, _, locale) => `${path}#${locale}`,
 )
