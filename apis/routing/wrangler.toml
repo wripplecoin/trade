@@ -20,7 +20,6 @@ r2_buckets = [
 ]
 name = "routing"
 [env.production.triggers]
-crons = ["*/30 * * * *"]
 
 # The necessary secrets are:
 # - ETH_NODE
