@@ -1,7 +1,7 @@
 import { AutoColumn, Button } from '@pancakeswap/uikit'
 
 import { useTranslation } from '@pancakeswap/localization'
-import replaceBrowserHistory from '@pancakeswap/utils/replaceBrowserHistory'
+import replaceBrowserHistoryMultiple from '@pancakeswap/utils/replaceBrowserHistoryMultiple'
 import { memo, useCallback } from 'react'
 
 import { AutoRow } from 'components/Layout/Row'
@@ -11,6 +11,7 @@ import { useSwapActionHandlers } from 'state/swap/useSwapActionHandlers'
 import { styled } from 'styled-components'
 
 import { SwapUIV2 } from '@pancakeswap/widgets-internal'
+import { useRouter } from 'next/router'
 import { useAllowRecipient } from '../../Swap/V3Swap/hooks'
 
 export const Line = styled.div`
@@ -33,8 +34,10 @@ export const FlipButton = memo(function FlipButton() {
 
   const onFlip = useCallback(() => {
     onSwitchTokens()
-    replaceBrowserHistory('inputCurrency', outputCurrencyId)
-    replaceBrowserHistory('outputCurrency', inputCurrencyId)
+    replaceBrowserHistoryMultiple({
+      inputCurrency: outputCurrencyId,
+      outputCurrency: inputCurrencyId,
+    })
   }, [onSwitchTokens, inputCurrencyId, outputCurrencyId])
 
   return (

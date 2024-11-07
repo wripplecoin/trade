@@ -28,7 +28,7 @@ import {
 import { Swap as SwapUI, useAsyncConfirmPriceImpactWithoutFee } from '@pancakeswap/widgets-internal'
 import { useQuery } from '@tanstack/react-query'
 
-import replaceBrowserHistory from '@pancakeswap/utils/replaceBrowserHistory'
+import replaceBrowserHistoryMultiple from '@pancakeswap/utils/replaceBrowserHistoryMultiple'
 import tryParseAmount from '@pancakeswap/utils/tryParseAmount'
 import { useUserSlippage } from '@pancakeswap/utils/user'
 import { useIsExpertMode } from '@pancakeswap/utils/user/expertMode'
@@ -292,12 +292,12 @@ const SwapPage = () => {
     (currency: Currency) => {
       shouldShowWarningModal(currency)
 
-      if (outputCurrency?.wrapped.equals(currency.wrapped) && inputCurrency) {
-        replaceBrowserHistory('outputCurrency', currencyId(inputCurrency))
-      }
-
+      replaceBrowserHistoryMultiple({
+        ...(outputCurrency?.wrapped.equals(currency.wrapped) &&
+          inputCurrency && { outputCurrency: currencyId(inputCurrency) }),
+        inputCurrency: currencyId(currency),
+      })
       dispatch(selectCurrency({ field: Field.INPUT, currencyId: currency.wrapped.address }))
-      replaceBrowserHistory('inputCurrency', currencyId(currency))
     },
     [dispatch, inputCurrency, outputCurrency?.wrapped, shouldShowWarningModal],
   )
@@ -306,20 +306,22 @@ const SwapPage = () => {
     (currency: Currency) => {
       shouldShowWarningModal(currency)
 
-      if (inputCurrency?.wrapped.equals(currency.wrapped) && outputCurrency) {
-        replaceBrowserHistory('inputCurrency', currencyId(outputCurrency))
-      }
-
+      replaceBrowserHistoryMultiple({
+        ...(inputCurrency?.wrapped.equals(currency.wrapped) &&
+          outputCurrency && { inputCurrency: currencyId(outputCurrency) }),
+        outputCurrency: currencyId(currency),
+      })
       dispatch(selectCurrency({ field: Field.OUTPUT, currencyId: currency.wrapped.address }))
-      replaceBrowserHistory('outputCurrency', currencyId(currency))
     },
     [dispatch, inputCurrency?.wrapped, outputCurrency, shouldShowWarningModal],
   )
 
   const handleSwitch = useCallback(() => {
     dispatch(switchCurrencies())
-    replaceBrowserHistory('inputCurrency', outputCurrencyId)
-    replaceBrowserHistory('outputCurrency', inputCurrencyId)
+    replaceBrowserHistoryMultiple({
+      inputCurrency: outputCurrencyId,
+      outputCurrency: inputCurrencyId,
+    })
   }, [dispatch, inputCurrencyId, outputCurrencyId])
 
   const handleAcceptChanges = useCallback(() => {

@@ -3,7 +3,7 @@ import { Currency, CurrencyAmount, Percent, Token, Trade, TradeType } from '@pan
 import { AutoColumn, BottomDrawer, Box, Button, Flex, Link, useMatchBreakpoints, useModal } from '@pancakeswap/uikit'
 import { Swap as SwapUI } from '@pancakeswap/widgets-internal'
 
-import replaceBrowserHistory from '@pancakeswap/utils/replaceBrowserHistory'
+import replaceBrowserHistoryMultiple from '@pancakeswap/utils/replaceBrowserHistoryMultiple'
 import AccessRisk from 'components/AccessRisk'
 import { ACCESS_TOKEN_SUPPORT_CHAIN_IDS } from 'components/AccessRisk/config/supportedChains'
 import { AppBody } from 'components/App'
@@ -145,10 +145,10 @@ const LimitOrders = () => {
       handleCurrencySelection(Field.INPUT, newInputCurrency)
 
       const newInputCurrencyId = currencyId(newInputCurrency)
-      if (newInputCurrencyId === currencyIds.output) {
-        replaceBrowserHistory('outputCurrency', currencyIds.input)
-      }
-      replaceBrowserHistory('inputCurrency', newInputCurrencyId)
+      replaceBrowserHistoryMultiple({
+        ...(newInputCurrencyId === currencyIds.output && { outputCurrency: currencyIds.input }),
+        inputCurrency: newInputCurrencyId,
+      })
     },
     [currencyIds.input, currencyIds.output, handleCurrencySelection],
   )
@@ -176,10 +176,10 @@ const LimitOrders = () => {
       handleCurrencySelection(Field.OUTPUT, newOutputCurrency)
 
       const newOutputCurrencyId = currencyId(newOutputCurrency)
-      if (newOutputCurrencyId === currencyIds.input) {
-        replaceBrowserHistory('inputCurrency', currencyIds.output)
-      }
-      replaceBrowserHistory('outputCurrency', newOutputCurrencyId)
+      replaceBrowserHistoryMultiple({
+        ...(newOutputCurrencyId === currencyIds.input && { inputCurrency: currencyIds.output }),
+        outputCurrency: newOutputCurrencyId,
+      })
     },
     [currencyIds.input, currencyIds.output, handleCurrencySelection],
   )
@@ -275,8 +275,10 @@ const LimitOrders = () => {
   const handleTokenSwitch = useCallback(() => {
     setApprovalSubmitted(false)
     handleSwitchTokens()
-    replaceBrowserHistory('inputCurrency', currencyIds.output)
-    replaceBrowserHistory('outputCurrency', currencyIds.input)
+    replaceBrowserHistoryMultiple({
+      inputCurrency: currencyIds.output,
+      outputCurrency: currencyIds.input,
+    })
   }, [handleSwitchTokens, currencyIds.output, currencyIds.input])
 
   const { realExecutionPriceAsString } = useGasOverhead(parsedAmounts.input, parsedAmounts.output, rateType)

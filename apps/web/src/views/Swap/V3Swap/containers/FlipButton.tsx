@@ -2,7 +2,7 @@ import { AutoColumn, Button } from '@pancakeswap/uikit'
 import { Swap as SwapUI } from '@pancakeswap/widgets-internal'
 
 import { useCallback, memo } from 'react'
-import replaceBrowserHistory from '@pancakeswap/utils/replaceBrowserHistory'
+import replaceBrowserHistoryMultiple from '@pancakeswap/utils/replaceBrowserHistoryMultiple'
 import { useTranslation } from '@pancakeswap/localization'
 
 import { useExpertMode } from '@pancakeswap/utils/user'
@@ -26,8 +26,10 @@ export const FlipButton = memo(function FlipButton() {
 
   const onFlip = useCallback(() => {
     onSwitchTokens()
-    replaceBrowserHistory('inputCurrency', outputCurrencyId)
-    replaceBrowserHistory('outputCurrency', inputCurrencyId)
+    replaceBrowserHistoryMultiple({
+      inputCurrency: outputCurrencyId,
+      outputCurrency: inputCurrencyId,
+    })
   }, [onSwitchTokens, inputCurrencyId, outputCurrencyId])
 
   return (
