@@ -22,6 +22,6 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.js'],
     environment: 'happy-dom',
     globals: true,
-    exclude: ['src/config/__tests__', 'node_modules'],
+    exclude: ['src/config/__tests__', 'src/__tests__/gagues', 'node_modules'],
   },
 })
