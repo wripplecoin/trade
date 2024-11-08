@@ -1,8 +1,8 @@
 import { ERC20Token } from '@pancakeswap/sdk'
-import { useQueries, UseQueryOptions, UseQueryResult } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { SLOW_INTERVAL } from 'config/constants'
 import { useOfficialsAndUserAddedTokensByChainIds } from 'hooks/Tokens'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { AppState } from 'state'
 import { Address } from 'viem'
@@ -34,39 +34,47 @@ export const useAccountV2LpDetails = (chainIds: number[], account?: Address | nu
     fetchLpTokens()
   }, [chainIds, tokens, userSavedPairs])
 
+  const totalTokenPairCount = useMemo(() => {
+    if (!lpTokensByChain) return 0
+
+    return Object.values(lpTokensByChain).reduce((total, tokenPairs) => {
+      return total + tokenPairs.length
+    }, 0)
+  }, [lpTokensByChain])
+
   const [latestTxReceipt] = useLatestTxReceipt()
-  const queries = useMemo(() => {
-    if (!lpTokensByChain) {
-      return []
-    }
 
-    return Object.entries(lpTokensByChain).map(([chainId, lpTokens]) => {
-      return {
-        queryKey: ['accountV2LpDetails', account, chainId, lpTokens.length, latestTxReceipt?.blockHash],
-        // @todo @ChefJerry add signal
-        queryFn: () => getAccountV2LpDetails(Number(chainId), account!, lpTokens),
-        enabled: !!account && lpTokens && lpTokens.length > 0,
-        select(data) {
-          return data.filter((d) => d.nativeBalance.greaterThan('0') || d.farmingBalance.greaterThan('0'))
-        },
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        // Prevents re-fetching while the data is still fresh
-        staleTime: SLOW_INTERVAL,
-      } satisfies UseQueryOptions<V2LPDetail[]>
-    })
-  }, [account, lpTokensByChain, latestTxReceipt?.blockHash])
-
-  const combine = useCallback((results: UseQueryResult<V2LPDetail[], Error>[]) => {
-    return {
-      data: results.reduce((acc, result) => acc.concat(result.data ?? []), [] as V2LPDetail[]),
-      pending: results.some((result) => result.isPending),
-    }
-  }, [])
-
-  return useQueries({
-    queries,
-    combine,
+  const query = useQuery<V2LPDetail[], Error>({
+    queryKey: ['accountV2LpDetails', account, chainIds.join('-'), totalTokenPairCount, latestTxReceipt?.blockHash],
+    queryFn: async () => {
+      if (!account || !lpTokensByChain) return []
+      const results = await Promise.all(
+        Object.entries(lpTokensByChain).map(async ([chainId, lpTokens]) => {
+          if (lpTokens.length === 0) return []
+          try {
+            const details = await getAccountV2LpDetails(Number(chainId), account, lpTokens)
+            return details.filter((d) => d.nativeBalance.greaterThan('0') || d.farmingBalance.greaterThan('0'))
+          } catch (error) {
+            console.error(`Error fetching LP details for chainId ${chainId}:`, error)
+            return []
+          }
+        }),
+      )
+      return results.flat()
+    },
+    enabled: !!account && !!lpTokensByChain,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    // Prevents re-fetching while the data is still fresh
+    staleTime: SLOW_INTERVAL,
   })
+
+  return useMemo(
+    () => ({
+      data: query.data ?? [],
+      pending: query.isLoading || query.isFetching,
+    }),
+    [query.data, query.isLoading, query.isFetching],
+  )
 }

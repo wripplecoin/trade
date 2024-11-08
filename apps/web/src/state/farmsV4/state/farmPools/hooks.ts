@@ -1,15 +1,14 @@
-import { ChainId } from '@pancakeswap/chains'
 import { Protocol, UniversalFarmConfig, fetchAllUniversalFarms, masterChefV3Addresses } from '@pancakeswap/farms'
 import { masterChefAddresses } from '@pancakeswap/farms/src/const'
 import { masterChefV3ABI } from '@pancakeswap/v3-sdk'
-import { UseQueryResult, useQueries, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { masterChefV2ABI } from 'config/abi/masterchefV2'
 import { QUERY_SETTINGS_IMMUTABLE, SLOW_INTERVAL } from 'config/constants'
 import dayjs from 'dayjs'
 import { useAtom } from 'jotai'
 import groupBy from 'lodash/groupBy'
 import keyBy from 'lodash/keyBy'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { publicClient } from 'utils/viem'
 import { zeroAddress } from 'viem'
 import { Address } from 'viem/accounts'
@@ -74,82 +73,89 @@ export const useFarmPools = () => {
 }
 
 export const useV3PoolsLength = (chainIds: number[]) => {
-  const queries = useMemo(() => {
-    return chainIds.map((chainId) => {
-      return {
-        queryKey: ['useV3PoolsLength', chainId],
-        queryFn: () => {
+  const { data, isPending } = useQuery<{ [key: number]: number }, Error>({
+    queryKey: ['useV3PoolsLength', chainIds?.join('-')],
+    queryFn: async () => {
+      const results = await Promise.all(
+        chainIds.map(async (chainId) => {
           const client = publicClient({ chainId })
-          return client.readContract({
-            address: masterChefV3Addresses[chainId],
-            abi: masterChefV3ABI,
-            functionName: 'poolLength',
-          })
-        },
-        enabled: !!chainId,
-        ...QUERY_SETTINGS_IMMUTABLE,
-        refetchInterval: SLOW_INTERVAL,
-        staleTime: SLOW_INTERVAL,
-      }
-    })
-  }, [chainIds])
-
-  const combine = useCallback(
-    (results: UseQueryResult<bigint, Error>[]) => {
-      return {
-        data: results.reduce((acc, result, idx) => {
-          Object.assign(acc, { [chainIds[idx]]: Number(result.data ?? 0) })
-          return acc
-        }, {} as { [key: `${number}`]: number }),
-        pending: results.some((result) => result.isPending),
-      }
+          try {
+            const poolLength = await client.readContract({
+              address: masterChefV3Addresses[chainId],
+              abi: masterChefV3ABI,
+              functionName: 'poolLength',
+            })
+            return { chainId, length: Number(poolLength) }
+          } catch (error) {
+            console.error(`Error fetching pool length for chainId ${chainId}:`, error)
+            return { chainId, length: 0 }
+          }
+        }),
+      )
+      return results.reduce((acc, { chainId, length }) => {
+        // eslint-disable-next-line no-param-reassign
+        acc[chainId] = length
+        return acc
+      }, {} as { [key: number]: number })
     },
-    [chainIds],
-  )
-
-  return useQueries({
-    queries,
-    combine,
+    enabled: chainIds?.length > 0,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: SLOW_INTERVAL,
+    staleTime: SLOW_INTERVAL,
   })
+
+  return useMemo(
+    () => ({
+      data: data ?? {},
+      pending: isPending,
+    }),
+    [data, isPending],
+  )
 }
 
 export const useV2PoolsLength = (chainIds: number[]) => {
-  const queries = useMemo(() => {
-    return chainIds.map((chainId) => {
-      return {
-        queryKey: ['useV2PoolsLength', chainId],
-        queryFn: () => {
+  const { data, isPending } = useQuery<{ [key: number]: number }, Error>({
+    queryKey: ['useV2PoolsLength', chainIds?.join('-')],
+    queryFn: async () => {
+      const results = await Promise.all(
+        chainIds.map(async (chainId) => {
           const client = publicClient({ chainId })
-          return client.readContract({
-            address: masterChefAddresses[ChainId.BSC],
-            abi: masterChefV2ABI,
-            functionName: 'poolLength',
-          })
-        },
-        enabled: !!chainId,
-        ...QUERY_SETTINGS_IMMUTABLE,
-        refetchInterval: SLOW_INTERVAL,
-        staleTime: SLOW_INTERVAL,
-      }
-    })
-  }, [chainIds])
-
-  const combine = useCallback(
-    (results: UseQueryResult<bigint, Error>[]) => {
-      return {
-        data: results.reduce((acc, result, idx) => {
-          return Object.assign(acc, { [chainIds[idx]]: Number(result.data ?? 0) })
-        }, {} as { [key: `${number}`]: number }),
-        pending: results.some((result) => result.isPending),
-      }
+          try {
+            const poolLength = await client.readContract({
+              address: masterChefAddresses[chainId],
+              abi: masterChefV2ABI,
+              functionName: 'poolLength',
+            })
+            return { chainId, length: Number(poolLength) }
+          } catch (error) {
+            console.error(`Error fetching pool length for chainId ${chainId}:`, error)
+            return { chainId, length: 0 }
+          }
+        }),
+      )
+      return results.reduce((acc, { chainId, length }) => {
+        // eslint-disable-next-line no-param-reassign
+        acc[chainId] = length
+        return acc
+      }, {} as { [key: number]: number })
     },
-    [chainIds],
-  )
-
-  return useQueries({
-    queries,
-    combine,
+    enabled: chainIds?.length > 0,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: SLOW_INTERVAL,
+    staleTime: SLOW_INTERVAL,
   })
+
+  return useMemo(
+    () => ({
+      data: data ?? {},
+      pending: isPending,
+    }),
+    [data, isPending],
+  )
 }
 
 type IPoolsStatusType = {
@@ -163,33 +169,44 @@ export const useMultiChainV3PoolsStatus = (pools: UniversalFarmConfig[]) => {
   const poolsGroupByChains = useMemo(() => groupBy(v3Pools, 'chainId'), [v3Pools])
   const poolsEntries = useMemo(() => Object.entries(poolsGroupByChains), [poolsGroupByChains])
 
-  const queries = poolsEntries.map(([chainId, poolList]) => ({
-    queryKey: ['useMultiChainV3PoolsStatus', chainId, ...poolList.map((p) => p.lpAddress)],
-    queryFn: () => {
-      return fetchV3PoolsStatusByChainId(Number(chainId), poolList)
-    },
-    enabled: !!chainId && !!poolList.length,
-    ...QUERY_SETTINGS_IMMUTABLE,
-    refetchInterval: SLOW_INTERVAL,
-    staleTime: SLOW_INTERVAL,
-  }))
-  const combine = useCallback(
-    (results: UseQueryResult<UnwrapPromise<ReturnType<typeof fetchV3PoolsStatusByChainId>>, Error>[]) => {
-      return {
-        data: results.reduce((acc, result, idx) => {
-          return Object.assign(acc, {
-            [poolsEntries[idx][0]]: keyBy(result.data ?? [], ([, lpAddress]) => lpAddress),
-          })
-        }, {} as IPoolsStatusType),
-        pending: results.some((result) => result.isPending),
-      }
-    },
+  const chainIds = useMemo(() => poolsEntries.map(([chainId]) => chainId).join(','), [poolsEntries])
+  const lpAddresses = useMemo(
+    () => poolsEntries.flatMap(([, poolList]) => poolList.map((p) => p.lpAddress)).join(','),
     [poolsEntries],
   )
-  return useQueries({
-    queries,
-    combine,
+
+  const { data, isPending } = useQuery<IPoolsStatusType, Error>({
+    queryKey: ['useMultiChainV3PoolsStatus', chainIds, lpAddresses],
+    queryFn: async () => {
+      const results = await Promise.all(
+        poolsEntries.map(async ([chainId, poolList]) => {
+          if (!poolList.length) return { [chainId]: {} }
+          try {
+            const poolStatus = await fetchV3PoolsStatusByChainId(Number(chainId), poolList)
+            return { [chainId]: keyBy(poolStatus ?? [], ([, lpAddress]) => lpAddress) }
+          } catch (error) {
+            console.error(`Error fetching pool status for chainId ${chainId}:`, error)
+            return { [chainId]: {} }
+          }
+        }),
+      )
+      return results.reduce((acc, result) => ({ ...acc, ...result }), {} as IPoolsStatusType)
+    },
+    enabled: poolsEntries.length > 0,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: SLOW_INTERVAL,
+    staleTime: SLOW_INTERVAL,
   })
+
+  return useMemo(
+    () => ({
+      data: data ?? {},
+      pending: isPending,
+    }),
+    [data, isPending],
+  )
 }
 
 export const useV3PoolStatus = (pool?: PoolInfo | null) => {
@@ -244,38 +261,49 @@ export const useMultiChainPoolsTimeFrame = (pools: UniversalFarmConfig[]) => {
   const poolsGroupByChains = useMemo(() => groupBy(v2Pools, 'chainId'), [v2Pools])
   const poolsEntries = useMemo(() => Object.entries(poolsGroupByChains), [poolsGroupByChains])
 
-  const queries = poolsEntries.map(([chainId_, poolList]) => {
-    const chainId = Number(chainId_)
-    return {
-      queryKey: ['useMultiChainPoolTimeFrame', chainId, ...poolList.map((p) => p.lpAddress)],
-      queryFn: () => {
-        const bCakeAddresses = poolList.map(({ bCakeWrapperAddress }) => bCakeWrapperAddress ?? zeroAddress)
-        return fetchPoolsTimeFrame(bCakeAddresses, chainId)
-      },
-      enabled: !!chainId && !!poolList.length,
-      ...QUERY_SETTINGS_IMMUTABLE,
-      refetchInterval: SLOW_INTERVAL,
-      staleTime: SLOW_INTERVAL,
-    }
-  })
-  const combine = useCallback(
-    (results: UseQueryResult<UnwrapPromise<ReturnType<typeof fetchPoolsTimeFrame>>, Error>[]) => {
-      return {
-        data: results.reduce((acc, result, idx) => {
-          let dataIdx = 0
-          return Object.assign(acc, {
-            [poolsEntries[idx][0]]: keyBy(result.data ?? [], () => {
-              return poolsEntries[idx][1][dataIdx++].lpAddress
-            }),
-          })
-        }, {} as IPoolsTimeFrameType),
-        pending: results.some((result) => result.isPending),
-      }
-    },
+  const chainIds = useMemo(() => poolsEntries.map(([chainId]) => chainId).join(','), [poolsEntries])
+  const lpAddresses = useMemo(
+    () => poolsEntries.flatMap(([, poolList]) => poolList.map((p) => p.lpAddress)).join(','),
     [poolsEntries],
   )
-  return useQueries({
-    queries,
-    combine,
+
+  const { data, isPending } = useQuery<IPoolsTimeFrameType, Error>({
+    queryKey: ['useMultiChainPoolTimeFrame', chainIds, lpAddresses],
+    queryFn: async () => {
+      const results = await Promise.all(
+        poolsEntries.map(async ([chainId_, poolList]) => {
+          const chainId = Number(chainId_)
+          const bCakeAddresses = poolList.map(({ bCakeWrapperAddress }) => bCakeWrapperAddress ?? zeroAddress)
+          if (bCakeAddresses.length === 0) return { [chainId]: {} }
+          try {
+            const timeFrameData = await fetchPoolsTimeFrame(bCakeAddresses, chainId)
+            return timeFrameData ?? []
+          } catch (error) {
+            console.error(`Error fetching time frame data for chainId ${chainId}:`, error)
+            return []
+          }
+        }),
+      )
+      return results.reduce((acc, result, idx) => {
+        let dataIdx = 0
+        return Object.assign(acc, {
+          [poolsEntries[idx][0]]: keyBy(result, () => poolsEntries[idx][1][dataIdx++].lpAddress),
+        })
+      }, {} as IPoolsTimeFrameType)
+    },
+    enabled: poolsEntries.length > 0,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: SLOW_INTERVAL,
+    staleTime: SLOW_INTERVAL,
   })
+
+  return useMemo(
+    () => ({
+      data: data ?? {},
+      pending: isPending,
+    }),
+    [data, isPending],
+  )
 }
