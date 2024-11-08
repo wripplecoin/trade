@@ -14,10 +14,11 @@ interface PathList {
   defaultTitleSuffix: string
 }
 
-const getPathList = (t: ContextApi['t']): PathList => {
+const getPathList = memoize((t: ContextApi['t']): PathList => {
   return {
     paths: {
-      '/': { title: t('Home') },
+      '/home': { title: t('Home') },
+      '/': { basePath: true, title: t('Exchange'), image: `${ASSET_CDN}/web/og/swap.jpg` },
       '/swap': { basePath: true, title: t('Exchange'), image: `${ASSET_CDN}/web/og/swap.jpg` },
       '/limit-orders': { basePath: true, title: t('Limit Orders'), image: `${ASSET_CDN}/web/og/limit.jpg` },
       '/add': { basePath: true, title: t('Add Liquidity'), image: `${ASSET_CDN}/web/og/liquidity.jpg` },
@@ -38,6 +39,7 @@ const getPathList = (t: ContextApi['t']): PathList => {
       '/voting/proposal': { title: t('Proposals'), image: `${ASSET_CDN}/web/og/voting.jpg` },
       '/voting/proposal/create': { title: t('Make a Proposal'), image: `${ASSET_CDN}/web/og/voting.jpg` },
       '/info': {
+        basePath: true,
         title: `${t('Overview')} - ${t('Info')}`,
         description: 'View statistics for Pancakeswap exchanges.',
         image: `${ASSET_CDN}/web/og/info.jpg`,
@@ -47,15 +49,25 @@ const getPathList = (t: ContextApi['t']): PathList => {
         description: 'View statistics for Pancakeswap exchanges.',
         image: `${ASSET_CDN}/web/og/info.jpg`,
       },
+      '/info/tokens': {
+        title: `${t('Tokens')} - ${t('Info')}`,
+        description: 'View statistics for Pancakeswap exchanges.',
+        image: `${ASSET_CDN}/web/og/info.jpg`,
+      },
+      '/info/v3/pairs': {
+        title: `${t('Pairs')} - ${t('Info')}`,
+        description: 'View statistics for Pancakeswap exchanges.',
+        image: `${ASSET_CDN}/web/og/info.jpg`,
+      },
+      '/info/v3/tokens': {
+        title: `${t('Tokens')} - ${t('Info')}`,
+        description: 'View statistics for Pancakeswap exchanges.',
+        image: `${ASSET_CDN}/web/og/info.jpg`,
+      },
       '/liquidity/pool': {
         basePath: true,
         title: `${t('Pool Detail')}`,
         description: 'View statistics for Pancakeswap pool.',
-        image: `${ASSET_CDN}/web/og/info.jpg`,
-      },
-      '/info/tokens': {
-        title: `${t('Tokens')} - ${t('Info')}`,
-        description: 'View statistics for Pancakeswap exchanges.',
         image: `${ASSET_CDN}/web/og/info.jpg`,
       },
       '/nfts': { title: t('NFT Marketplace'), image: `${ASSET_CDN}/web/og/nft.jpg` },
@@ -71,13 +83,18 @@ const getPathList = (t: ContextApi['t']): PathList => {
     },
     defaultTitleSuffix: t('PancakeSwap'),
   }
-}
+})
 
 export const getCustomMeta = memoize(
   (path: string, t: ContextApi['t'], _: string): PageMeta | null => {
     const pathList = getPathList(t)
-    const basePath = Object.entries(pathList.paths).find(([url, data]) => data.basePath && path.startsWith(url))?.[0]
-    const pathMetadata = pathList.paths[path] ?? (basePath && pathList.paths[basePath])
+    let pathMetadata = pathList.paths[path]
+    if (!pathMetadata) {
+      const basePath = Object.entries(pathList.paths).find(([url, data]) => data.basePath && path.startsWith(url))?.[0]
+      if (basePath) {
+        pathMetadata = pathList.paths[basePath]
+      }
+    }
 
     if (pathMetadata) {
       return {
