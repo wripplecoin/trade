@@ -1,5 +1,12 @@
 # @pancakeswap/smart-router
 
+## 6.2.1
+
+### Patch Changes
+
+- Updated dependencies [6a9fd57]
+  - @pancakeswap/v4-sdk@0.1.5
+
 ## 6.2.0
 
 ### Minor Changes

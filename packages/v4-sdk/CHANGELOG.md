@@ -1,5 +1,11 @@
 # @pancakeswap/v4-sdk
 
+## 0.1.5
+
+### Patch Changes
+
+- 6a9fd57: Publish V4 SDK
+
 ## 0.1.4
 
 ### Patch Changes
