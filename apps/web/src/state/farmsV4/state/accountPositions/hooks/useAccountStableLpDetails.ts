@@ -30,7 +30,7 @@ export const useAccountStableLpDetails = (chainIds: number[], account?: Address 
       )
       return results.flat()
     },
-    enabled: !!account,
+    enabled: Boolean(account),
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

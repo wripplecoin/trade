@@ -295,6 +295,7 @@ export function useReadableTransactionType(type?: TransactionType) {
       case 'add-liquidity':
       case 'increase-liquidity-v3':
       case 'add-liquidity-v3':
+      case 'zap-liquidity-v3':
         return t('Add Liquidity')
       case 'remove-liquidity':
       case 'remove-liquidity-v3':

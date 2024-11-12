@@ -73,7 +73,7 @@ export const useAccountPositionDetailByPool = <TProtocol extends keyof PoolPosit
   return useQuery({
     queryKey: ['accountPosition', account, chainId, poolInfo?.lpAddress, latestTxReceipt?.blockHash],
     queryFn,
-    enabled: !!account && !!poolInfo?.lpAddress,
+    enabled: Boolean(account && poolInfo?.lpAddress),
     select,
   })
 }

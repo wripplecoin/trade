@@ -143,7 +143,10 @@ export const V3PositionActions = ({
     [detailMode, isSwitchingNetwork, handleUnStake, isStaked, modalContent, t, outOfRange, stakeModal, attemptingTxn],
   )
 
-  const { earningsBusd } = useV3CakeEarning(tokenId ? [tokenId] : [], chainId)
+  const { earningsBusd } = useV3CakeEarning(
+    useMemo(() => (isStaked && tokenId ? [tokenId] : []), [tokenId, isStaked]),
+    chainId,
+  )
 
   return (
     <StopPropagation>

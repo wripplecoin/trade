@@ -1,4 +1,3 @@
-import type { TransactionReceipt } from 'viem'
 import { PositionDetails } from '@pancakeswap/farms'
 import { atom } from 'jotai'
 import { ChainIdAddressKey } from '../type'
@@ -7,13 +6,18 @@ export type AccountPositionMap = {
   [poolKey: ChainIdAddressKey]: PositionInfo
 }
 
+export interface TransactionReceiptTime {
+  confirmedTime: number
+  blockHash: string
+}
+
 export const userPositionsAtom = atom<Record<ChainIdAddressKey, AccountPositionMap>>({})
 
 export const cakePendingRewardsAtom = atom<Record<ChainIdAddressKey, number>>({})
 
 export const priceOfPositionsAtom = atom<Record<ChainIdAddressKey, { priceUSD: string }>>({})
 
-export const txReceiptAtom = atom<TransactionReceipt | null>(null)
+export const txReceiptAtom = atom<TransactionReceiptTime | null>(null)
 
 type PositionInfo = {
   chainId: number

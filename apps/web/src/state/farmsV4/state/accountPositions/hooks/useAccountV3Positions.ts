@@ -27,7 +27,7 @@ export const useAccountV3Positions = (chainIds: number[], account?: Address | nu
       )
       return results.flat()
     },
-    enabled: !!account,
+    enabled: Boolean(account),
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -36,7 +36,6 @@ export const useAccountV3Positions = (chainIds: number[], account?: Address | nu
     staleTime: SLOW_INTERVAL,
   })
 
-  // Memoize the result object
   return useMemo(
     () => ({
       data: data ?? [],

@@ -44,7 +44,7 @@ export const useAccountV2LpDetails = (chainIds: number[], account?: Address | nu
 
   const [latestTxReceipt] = useLatestTxReceipt()
 
-  const query = useQuery<V2LPDetail[], Error>({
+  const { data, isFetching, isLoading } = useQuery<V2LPDetail[], Error>({
     queryKey: ['accountV2LpDetails', account, chainIds.join('-'), totalTokenPairCount, latestTxReceipt?.blockHash],
     queryFn: async () => {
       if (!account || !lpTokensByChain) return []
@@ -62,7 +62,7 @@ export const useAccountV2LpDetails = (chainIds: number[], account?: Address | nu
       )
       return results.flat()
     },
-    enabled: !!account && !!lpTokensByChain,
+    enabled: Boolean(account && lpTokensByChain),
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -72,9 +72,9 @@ export const useAccountV2LpDetails = (chainIds: number[], account?: Address | nu
 
   return useMemo(
     () => ({
-      data: query.data ?? [],
-      pending: query.isLoading || query.isFetching,
+      data: data ?? [],
+      pending: isLoading || isFetching,
     }),
-    [query.data, query.isLoading, query.isFetching],
+    [data, isLoading, isFetching],
   )
 }

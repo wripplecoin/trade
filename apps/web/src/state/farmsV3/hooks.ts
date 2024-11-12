@@ -258,8 +258,7 @@ export const useStakedPositionsByUser = (stakedTokenIds: bigint[], _chainId?: nu
           })
       })
     },
-
-    enabled: Boolean(account),
+    enabled: Boolean(account && chainId),
     placeholderData: keepPreviousData,
   })
 
