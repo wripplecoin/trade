@@ -147,13 +147,13 @@ export function TWAPPanel({ limit }: { limit?: boolean }) {
   } = useSwapState()
 
   const handleCurrencySelect = useCallback(
-    (isInput: boolean, newCurrency: Currency) => {
+    (isInput: boolean, newCurrency?: Currency) => {
       onCurrencySelection(isInput ? Field.INPUT : Field.OUTPUT, newCurrency)
       warningSwapHandler(newCurrency)
 
       const oldCurrencyId = isInput ? inputCurrencyId : outputCurrencyId
       const otherCurrencyId = isInput ? outputCurrencyId : inputCurrencyId
-      const newCurrencyId = currencyId(newCurrency)
+      const newCurrencyId = newCurrency ? currencyId(newCurrency) : undefined
       replaceBrowserHistoryMultiple({
         ...(newCurrencyId === otherCurrencyId && { [isInput ? 'outputCurrency' : 'inputCurrency']: oldCurrencyId }),
         [isInput ? 'inputCurrency' : 'outputCurrency']: newCurrencyId,
