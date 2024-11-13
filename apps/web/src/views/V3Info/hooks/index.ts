@@ -9,7 +9,7 @@ import { getDeltaTimestamps } from 'utils/getDeltaTimestamps'
 import { v3InfoClients } from 'utils/graphql'
 import { useBlocksFromTimestamps } from 'views/Info/hooks/useBlocksFromTimestamps'
 
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { chainIdToExplorerInfoChainName, explorerApiClient } from 'state/info/api/client'
 import { useExplorerChainNameByQuery } from 'state/info/api/hooks'
 import { components } from 'state/info/api/schema'
@@ -41,9 +41,8 @@ import {
 import { transformPoolData } from '../utils'
 
 const QUERY_SETTINGS_IMMUTABLE = {
-  retry: 3,
   retryDelay: 3000,
-  keepPreviousData: true,
+  placeholderData: keepPreviousData,
   refetchOnMount: false,
   refetchOnReconnect: false,
   refetchOnWindowFocus: false,

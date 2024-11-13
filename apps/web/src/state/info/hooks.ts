@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { STABLE_SUPPORTED_CHAIN_IDS } from '@pancakeswap/stable-swap-sdk'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import BigNumber from 'bignumber.js'
 import { fetchAllTokenData, fetchAllTokenDataByAddresses } from 'state/info/queries/tokens/tokenData'
 import { Block, Transaction, TransactionType, TvlChartEntry, VolumeChartEntry } from 'state/info/types'
@@ -30,12 +30,11 @@ const QUERY_SETTINGS_IMMUTABLE = {
   refetchOnWindowFocus: false,
 }
 const QUERY_SETTINGS_WITHOUT_INTERVAL_REFETCH = {
-  retry: 3,
   retryDelay: 3000,
 }
 const QUERY_SETTINGS_INTERVAL_REFETCH = {
   refetchInterval: refreshIntervalForInfo,
-  keepPreviousData: true,
+  placeholderData: keepPreviousData,
   ...QUERY_SETTINGS_WITHOUT_INTERVAL_REFETCH,
 }
 
@@ -959,7 +958,7 @@ export const useTokenPriceDataQuery = (
       if (!chainName) {
         throw new Error('No chain name')
       }
-      return explorerApiClient
+      const result = await explorerApiClient
         .GET('/cached/tokens/chart/{chainName}/{address}/{protocol}/price', {
           signal,
           params: {
@@ -984,6 +983,7 @@ export const useTokenPriceDataQuery = (
             }
           }),
         )
+      return result
     },
     ...QUERY_SETTINGS_IMMUTABLE,
     ...QUERY_SETTINGS_INTERVAL_REFETCH,
