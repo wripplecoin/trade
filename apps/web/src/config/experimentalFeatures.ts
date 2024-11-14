@@ -3,6 +3,7 @@ export enum EXPERIMENTAL_FEATURES {
   SpeedQuote = 'routing-speed-quote',
   PriceAPI = 'price-api',
   PCSX = 'pcsx',
+  OPTIMIZED_AMM_TRADE = 'optimized-amm-trade',
 }
 
 export type EnumValues<T> = T extends { [key: string]: infer U } ? U : never
@@ -39,6 +40,11 @@ export const EXPERIMENTAL_FEATURE_CONFIGS: ExperimentalFeatureConfigs = [
   {
     feature: EXPERIMENTAL_FEATURES.PCSX,
     percentage: 1,
+    whitelist: [],
+  },
+  {
+    feature: EXPERIMENTAL_FEATURES.OPTIMIZED_AMM_TRADE,
+    percentage: 0.01,
     whitelist: [],
   },
 ]
