@@ -64,7 +64,7 @@ const TableRowItem: React.FC<{
   const { managerName } = usePositionManagerName(data)
 
   const maxCapPercent = useMemo(() => {
-    return new Percent(data?.maxVoteCap, 10000)
+    return new Percent(data?.maxVoteCap ?? 0, 10000)
   }, [data.maxVoteCap])
 
   const currentWeightPercent = useMemo(() => {

@@ -31,7 +31,7 @@ export const getAllGauges = async (
   const gaugesSC = await fetchGaugesSC(client, killed, blockNumber)
   const gaugesSCMap = keyBy(gaugesSC, 'gid')
 
-  const allGaugeInfoConfigs = gaugesCMS.map((config) => {
+  const allGaugeInfoConfigs = (killed ? gaugesCMS : gaugesCMS.filter((g) => !g.killed)).map((config) => {
     const correspondingSC = gaugesSCMap[config.gid]
     const mergedConfig: GaugeInfoConfig = { ...config, ...correspondingSC }
     return mergedConfig
