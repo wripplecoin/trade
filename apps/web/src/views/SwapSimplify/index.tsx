@@ -3,7 +3,6 @@ import { BottomDrawer, Box, Flex, useMatchBreakpoints } from '@pancakeswap/uikit
 import { useRouter } from 'next/router'
 import { useContext, useEffect, useState } from 'react'
 
-import { AdPanel } from 'components/AdPanel'
 import { useCurrency } from 'hooks/Tokens'
 import { useSwapHotTokenDisplay } from 'hooks/useSwapHotTokenDisplay'
 import { Field } from 'state/swap/actions'
@@ -71,7 +70,7 @@ export default function V4Swap() {
   )
 
   return (
-    <Page removePadding hideFooterOnDesktop={isChartExpanded || false} showExternalLink={false} showHelpLink={false}>
+    <Page removePadding hideFooterOnDesktop={isChartExpanded || false} showExternalLink={false} showHelpLink>
       <Flex
         width="100%"
         height="100%"
@@ -131,8 +130,6 @@ export default function V4Swap() {
           </StyledSwapContainer>
         </Flex>
       </Flex>
-
-      <AdPanel.MobileCard />
     </Page>
   )
 }

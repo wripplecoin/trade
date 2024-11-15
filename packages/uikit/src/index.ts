@@ -31,5 +31,5 @@ export * from "./util/animationToolkit";
 export { default as getPortalRoot } from "./util/getPortalRoot";
 
 // Providers
-export { DialogProvider } from "./hooks/useDialog/DialogContext";
 export * from "./Providers";
+export { DialogProvider } from "./hooks/useDialog/DialogContext";

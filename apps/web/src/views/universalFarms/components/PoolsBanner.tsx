@@ -8,7 +8,6 @@ import { FarmFlexWrapper, FarmH1, FarmH2 } from 'views/Farms/styled'
 export const PoolsBanner = ({ additionLink }: { additionLink?: React.ReactNode }) => {
   const { t } = useTranslation()
   const { theme } = useTheme()
-
   return (
     <PageHeader>
       <Column>

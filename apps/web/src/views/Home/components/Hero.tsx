@@ -2,7 +2,6 @@ import { useTranslation } from '@pancakeswap/localization'
 import { Button, Flex, Text, useMatchBreakpoints } from '@pancakeswap/uikit'
 import { NextLinkFromReactRouter } from '@pancakeswap/widgets-internal'
 
-import { AdPanel } from 'components/AdPanel'
 import ConnectWalletButton from 'components/ConnectWalletButton'
 import { ASSET_CDN } from 'config/constants/endpoints'
 import useTheme from 'hooks/useTheme'
@@ -246,6 +245,7 @@ const Hero = () => {
           >
             {t('Trade, earn, and own crypto on the all-in-one multichain DEX')}
           </Text>
+
           <Flex justifyContent={isMobile || isMd ? 'center' : 'start'}>
             {!account && <ConnectWalletButton style={{ borderRadius: isXs ? 12 : undefined }} scale="md" mr="8px" />}
             <NextLinkFromReactRouter to="/swap">
@@ -257,15 +257,6 @@ const Hero = () => {
                 {t('Trade Now')}
               </Button>
             </NextLinkFromReactRouter>
-          </Flex>
-          <Flex
-            mt="32px"
-            alignItems="center"
-            justifyContent="center"
-            width="fit-content"
-            mx={['auto', 'auto', 'auto', '0']}
-          >
-            <AdPanel.AdPlayer />
           </Flex>
         </Flex>
         <Flex

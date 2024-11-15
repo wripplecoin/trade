@@ -8,7 +8,6 @@ import { CHAIN_IDS } from 'utils/wagmi'
 import AddLiquidityV2FormProvider from 'views/AddLiquidity/AddLiquidityV2FormProvider'
 import { AddLiquidityV3Layout, UniversalAddLiquidity } from 'views/AddLiquidityV3'
 import { SELECTOR_TYPE } from 'views/AddLiquidityV3/types'
-import { PageWithoutFAQ } from 'views/Page'
 import useStableConfig from 'views/Swap/hooks/useStableConfig'
 
 const AddStableLiquidityPage = () => {
@@ -45,7 +44,6 @@ const AddStableLiquidityPage = () => {
 }
 
 AddStableLiquidityPage.chains = CHAIN_IDS
-AddStableLiquidityPage.Layout = PageWithoutFAQ
 
 export default AddStableLiquidityPage
 

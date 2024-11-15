@@ -8,7 +8,6 @@ const TitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-grow: 0;
   cursor: pointer;
 `;
 const ContentWrapper = styled.div``;
@@ -18,7 +17,6 @@ const IconWrapper = styled.div`
   align-items: center;
   transform: rotate(0deg);
   transition: transform 0.25s ease;
-  flex-grow: 0;
   cursor: pointer;
   &.open {
     transform: rotate(180deg);
@@ -31,7 +29,6 @@ const Container = styled.div`
   width: 100%;
   flex-direction: column;
   padding: ${PADDING}px;
-  flex-grow: 0;
   will-change: height;
   transition: height 0.25s ease-in-out;
 `;

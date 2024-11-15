@@ -12,7 +12,6 @@ import {
   IconButton,
   PreTitle,
   RefreshIcon,
-  useMatchBreakpoints,
 } from '@pancakeswap/uikit'
 
 import { FeeAmount, Pool } from '@pancakeswap/v3-sdk'
@@ -25,6 +24,7 @@ import currencyId from 'utils/currencyId'
 import { AppHeader } from 'components/App'
 import { atom, useAtom } from 'jotai'
 import { styled } from 'styled-components'
+import Page from 'views/Page'
 
 import { usePreviousValue } from '@pancakeswap/hooks'
 import { useCurrency } from 'hooks/Tokens'
@@ -34,10 +34,10 @@ import useStableConfig, { StableConfigContext } from 'views/Swap/hooks/useStable
 
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import noop from 'lodash/noop'
-import { usePoolInfo } from 'state/farmsV4/state/extendPools/hooks'
 import { resetMintState } from 'state/mint/actions'
 import { useAddLiquidityV2FormDispatch } from 'state/mint/reducer'
 import { safeGetAddress } from 'utils'
+import { usePoolInfo } from 'state/farmsV4/state/extendPools/hooks'
 import FeeSelector from './formViews/V3FormView/components/FeeSelector'
 
 import { AprCalculatorV2 } from './components/AprCalculatorV2'
@@ -391,7 +391,7 @@ export function AddLiquidityV3Layout({
 
   const [selectType] = useAtom(selectTypeAtom)
   const { currencyIdA, currencyIdB, feeAmount } = useCurrencyParams()
-  const { isMobile } = useMatchBreakpoints()
+
   const baseCurrency = useCurrency(currencyIdA)
   const quoteCurrency = useCurrency(currencyIdB)
   const poolAddress = useMemo(
@@ -418,22 +418,24 @@ export function AddLiquidityV3Layout({
   )
 
   return (
-    <BodyWrapper mb={isMobile ? '40px' : '0px'}>
-      <AppHeader
-        title={title}
-        backTo="/liquidity/positions"
-        IconSlot={
-          <>
-            {selectType === SELECTOR_TYPE.V3 && <AprCalculatorV2 derived pool={pool} inverted={inverted} />}
-            {showRefreshButton && (
-              <IconButton variant="text" scale="sm">
-                <RefreshIcon onClick={handleRefresh || noop} color="textSubtle" height={24} width={24} />
-              </IconButton>
-            )}
-          </>
-        }
-      />
-      {children}
-    </BodyWrapper>
+    <Page>
+      <BodyWrapper>
+        <AppHeader
+          title={title}
+          backTo="/liquidity/positions"
+          IconSlot={
+            <>
+              {selectType === SELECTOR_TYPE.V3 && <AprCalculatorV2 derived pool={pool} inverted={inverted} />}
+              {showRefreshButton && (
+                <IconButton variant="text" scale="sm">
+                  <RefreshIcon onClick={handleRefresh || noop} color="textSubtle" height={24} width={24} />
+                </IconButton>
+              )}
+            </>
+          }
+        />
+        {children}
+      </BodyWrapper>
+    </Page>
   )
 }

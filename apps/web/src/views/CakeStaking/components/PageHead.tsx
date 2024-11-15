@@ -11,7 +11,6 @@ import {
   useMatchBreakpoints,
 } from '@pancakeswap/uikit'
 import { NextLinkFromReactRouter } from '@pancakeswap/widgets-internal'
-import { AdPanel } from 'components/AdPanel'
 import { useMemo } from 'react'
 import styled, { css } from 'styled-components'
 import { useCakeLockStatus } from '../hooks/useVeCakeUserInfo'
@@ -20,39 +19,29 @@ import { HeadBunny, MobileHeadBunny } from './HeadImage'
 
 export const PageHead = () => {
   const { t } = useTranslation()
-  const { isMobile } = useMatchBreakpoints()
 
   return (
-    <>
-      {isMobile && (
-        <Box mb="16px">
-          <AdPanel.AdPlayer />
-        </Box>
-      )}
-      <Flex justifyContent="space-between" flexDirection="row">
-        <Flex flex="1" flexDirection="column" mr={[0, 0, '8px']}>
-          <Heading />
-          <Description />
-          <NextLinkFromReactRouter
-            to="/swap?chain=bsc&inputCurrency=BNB&outputCurrency=0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82"
-            prefetch={false}
-            style={{ width: 'fit-content' }}
-          >
-            <Button p="0" variant="text" mt="4px">
-              <Text color="primary" bold fontSize="16px" mr="4px">
-                {t('Get CAKE')}
-              </Text>
-              <ArrowForwardIcon color="primary" />
-            </Button>
-          </NextLinkFromReactRouter>
-        </Flex>
-
-        {/* <Box>{!isMobile && <AdPanel.AdPlayer />}</Box> */}
-        <Box>
-          <HeadBunny />
-        </Box>
+    <Flex justifyContent="space-between" flexDirection="row">
+      <Flex flex="1" flexDirection="column" mr={[0, 0, '8px']}>
+        <Heading />
+        <Description />
+        <NextLinkFromReactRouter
+          to="/swap?chain=bsc&inputCurrency=BNB&outputCurrency=0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82"
+          prefetch={false}
+        >
+          <Button p="0" variant="text" mt="4px">
+            <Text color="primary" bold fontSize="16px" mr="4px">
+              {t('Get CAKE')}
+            </Text>
+            <ArrowForwardIcon color="primary" />
+          </Button>
+        </NextLinkFromReactRouter>
       </Flex>
-    </>
+
+      <Box>
+        <HeadBunny />
+      </Box>
+    </Flex>
   )
 }
 

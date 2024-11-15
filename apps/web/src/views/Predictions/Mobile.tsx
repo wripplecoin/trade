@@ -1,6 +1,5 @@
 import { PredictionStatus } from '@pancakeswap/prediction'
 import { Box, Flex, Link } from '@pancakeswap/uikit'
-import { AdPanel } from 'components/AdPanel'
 import { memo } from 'react'
 import { useGetPredictionsStatus, useIsChartPaneOpen, useIsHistoryPaneOpen } from 'state/predictions/hooks'
 import { styled } from 'styled-components'
@@ -51,9 +50,6 @@ const Mobile: React.FC<React.PropsWithChildren> = () => {
 
   return (
     <StyledMobile>
-      <Flex mt="24px" justifyContent="center">
-        <AdPanel.MobileCard />
-      </Flex>
       <Box height="100%">
         {view === PageView.POSITIONS && (
           <Flex justifyContent="center" alignItems="center" flexDirection="column" minHeight="100%">

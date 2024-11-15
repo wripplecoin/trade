@@ -63,7 +63,6 @@ import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, memo, useCallback, useMemo, useState } from 'react'
-import { usePoolInfo } from 'state/farmsV4/state/extendPools/hooks'
 import { ChainLinkSupportChains } from 'state/info/constant'
 import { useSingleCallResult } from 'state/multicall/hooks'
 import { useIsTransactionPending, useTransactionAdder } from 'state/transactions/hooks'
@@ -80,8 +79,9 @@ import { unwrappedToken } from 'utils/wrappedCurrency'
 import { hexToBigInt } from 'viem'
 import { AprCalculatorV2 } from 'views/AddLiquidityV3/components/AprCalculatorV2'
 import RateToggle from 'views/AddLiquidityV3/formViews/V3FormView/components/RateToggle'
-import { PageWithoutFAQ } from 'views/Page'
+import Page from 'views/Page'
 import { useSendTransaction, useWalletClient } from 'wagmi'
+import { usePoolInfo } from 'state/farmsV4/state/extendPools/hooks'
 
 export const BodyWrapper = styled(Card)`
   border-radius: 24px;
@@ -517,7 +517,7 @@ export default function PoolPage() {
     ) : null
 
   return (
-    <Box mb="40px">
+    <Page>
       {!isLoading && <NextSeo title={`${currencyQuote?.symbol}-${currencyBase?.symbol} V3 LP #${tokenIdFromUrl}`} />}
       <BodyWrapper>
         {isLoading ? (
@@ -819,13 +819,12 @@ export default function PoolPage() {
           </>
         )}
       </BodyWrapper>
-    </Box>
+    </Page>
   )
 }
 
 PoolPage.chains = CHAIN_IDS
 PoolPage.screen = true
-PoolPage.Layout = PageWithoutFAQ
 
 type PositionTX = {
   id: string

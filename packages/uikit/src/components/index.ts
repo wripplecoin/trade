@@ -14,7 +14,6 @@ export * from "./Card";
 export * from "./Chart";
 export * from "./Checkbox";
 export * from "./CoinSwitcher";
-export * from "./Collapse";
 export * from "./Column";
 export * from "./CopyButton";
 export * from "./DateStep";
