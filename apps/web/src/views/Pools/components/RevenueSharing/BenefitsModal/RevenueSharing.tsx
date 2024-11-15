@@ -24,7 +24,7 @@ const RevenueSharing: React.FunctionComponent<React.PropsWithChildren<RevenueSha
   const cakePrice = useCakePrice()
   const { userData } = useVaultPoolByKey(VaultKey.CakeVault) as DeserializedLockedCakeVault
 
-  const { lastTokenTimestamp, availableClaim } = useRevenueSharingPool()
+  const { lastDistributionTimestamp, availableClaim } = useRevenueSharingPool()
 
   const availableCake = useMemo(() => getBalanceAmount(new BigNumber(availableClaim)).toNumber(), [availableClaim])
   const availableCakeUsdValue = useMemo(
@@ -49,7 +49,7 @@ const RevenueSharing: React.FunctionComponent<React.PropsWithChildren<RevenueSha
               title={t('Last distribution')}
               tooltipComponent={<Text>{t('The time of the last revenue distribution and shares update.')}</Text>}
             />
-            <Text bold>{timeFormat(locale, lastTokenTimestamp)}</Text>
+            <Text bold>{timeFormat(locale, lastDistributionTimestamp)}</Text>
           </Flex>
 
           <Flex mt="8px" flexDirection="row" alignItems="center">
