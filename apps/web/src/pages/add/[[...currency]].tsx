@@ -10,6 +10,7 @@ import { AddLiquidityV3Layout, UniversalAddLiquidity } from 'views/AddLiquidityV
 import LiquidityFormProvider from 'views/AddLiquidityV3/formViews/V3FormView/form/LiquidityFormProvider'
 import { useCurrencyParams } from 'views/AddLiquidityV3/hooks/useCurrencyParams'
 import { SELECTOR_TYPE } from 'views/AddLiquidityV3/types'
+import { PageWithoutFAQ } from 'views/Page'
 
 const AddLiquidityPage = () => {
   const router = useRouter()
@@ -86,5 +87,6 @@ const AddLiquidityPage = () => {
 
 AddLiquidityPage.chains = CHAIN_IDS
 AddLiquidityPage.screen = true
+AddLiquidityPage.Layout = PageWithoutFAQ
 
 export default AddLiquidityPage

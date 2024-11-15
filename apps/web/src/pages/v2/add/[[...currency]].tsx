@@ -7,6 +7,7 @@ import { CHAIN_IDS } from 'utils/wagmi'
 import AddLiquidityV2FormProvider from 'views/AddLiquidity/AddLiquidityV2FormProvider'
 import { AddLiquidityV3Layout, UniversalAddLiquidity } from 'views/AddLiquidityV3'
 import { SELECTOR_TYPE } from 'views/AddLiquidityV3/types'
+import { PageWithoutFAQ } from 'views/Page'
 
 const AddLiquidityPage = () => {
   const router = useRouter()
@@ -34,6 +35,7 @@ const AddLiquidityPage = () => {
 
 AddLiquidityPage.chains = CHAIN_IDS
 AddLiquidityPage.screen = true
+AddLiquidityPage.Layout = PageWithoutFAQ
 
 export default AddLiquidityPage
 
