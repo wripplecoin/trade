@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import useAccountActiveChain from 'hooks/useAccountActiveChain'
 import { useGaugesVotingContract } from 'hooks/useContract'
 import { useMemo } from 'react'
-import { publicClient as getPublicClient } from 'utils/viem'
 import { isAddressEqual } from 'utils'
+import { publicClient as getPublicClient } from 'utils/viem'
 import { Hex, zeroAddress } from 'viem'
 import { useVeCakeUserInfo } from 'views/CakeStaking/hooks/useVeCakeUserInfo'
 import { CakePoolType } from 'views/CakeStaking/types'
@@ -35,7 +35,7 @@ export const useUserVoteSlopes = () => {
       userInfo?.cakePoolProxy,
       publicClient,
     ],
-
+    initialData: [],
     queryFn: async (): Promise<VoteSlope[]> => {
       if (!gauges || gauges.length === 0 || !account || !publicClient) return []
 
@@ -88,7 +88,7 @@ export const useUserVoteSlopes = () => {
   })
 
   return {
-    data: data ?? [],
+    data,
     refetch,
     isLoading,
   }
