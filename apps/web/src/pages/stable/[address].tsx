@@ -156,7 +156,7 @@ export default function StablePoolPage() {
       <BodyWrapper>
         <AppHeader
           title={`${stableLp?.token0?.symbol}-${stableLp?.token1?.symbol} LP`}
-          backTo="/liquidity/pools"
+          backTo="/liquidity/positions"
           noConfig
           buttons={
             !isMobile && (
