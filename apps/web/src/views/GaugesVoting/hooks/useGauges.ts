@@ -20,7 +20,7 @@ export const useGauges = () => {
         const result = (await response.json()) as Response
 
         const gauges = result.data
-          .filter((g) => !g.hash)
+          .filter((g) => !!g.hash)
           .map((gauge) => ({
             ...gauge,
             weight: BigInt(gauge.weight),
