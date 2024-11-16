@@ -44,13 +44,15 @@ export const useUserVoteSlopes = () => {
       const hasProxy =
         userInfo?.cakePoolProxy && !isAddressEqual(userInfo?.cakePoolProxy, zeroAddress) && userInfo && !delegated
 
-      const contracts = gauges.map((gauge) => {
-        return {
-          ...gaugesVotingContract,
-          functionName: 'voteUserSlopes',
-          args: [account, gauge.hash as Hex],
-        } as const
-      })
+      const contracts = gauges
+        .filter((g) => !!g.hash)
+        .map((gauge) => {
+          return {
+            ...gaugesVotingContract,
+            functionName: 'voteUserSlopes',
+            args: [account, gauge.hash as Hex],
+          } as const
+        })
 
       if (hasProxy) {
         gauges.forEach((gauge) => {
