@@ -87,8 +87,8 @@ export const pools: StableSwapPool[] = [
     quoteToken: bscTokens.usdt,
     stableSwapAddress: '0xb1Da7D2C257c5700612BdE35C8d7187dc80d79f1',
     infoStableSwapAddress: '0x150c8AbEB487137acCC541925408e73b92F39A50',
-    stableTotalFee: 0.0004,
-    stableLpFee: 0.0002,
+    stableTotalFee: 0.0001,
+    stableLpFee: 0.00005,
     stableLpFeeRateOfTotalFee: 0.5,
   },
   {
