@@ -308,20 +308,24 @@ const useStablePositions = ({
   }
 }
 
-const EmptyListPlaceholder = ({ text, imageUrl }: { text: string; imageUrl?: string }) => (
-  <FlexGap alignItems="center" flexDirection="column" gap="16px">
-    <img
-      width={156}
-      height={179}
-      alt="empty placeholder"
-      src={imageUrl ?? `${ASSET_CDN}/web/universalFarms/empty_list_bunny.png`}
-    />
-    <Text fontSize="14px" color="textSubtle" textAlign="center">
-      {text}
-    </Text>
-    <ConnectWalletButton />
-  </FlexGap>
-)
+const EmptyListPlaceholder = ({ text, imageUrl }: { text: string; imageUrl?: string }) => {
+  const { address: account } = useAccount()
+
+  return (
+    <FlexGap alignItems="center" flexDirection="column" gap="16px">
+      <img
+        width={156}
+        height={179}
+        alt="empty placeholder"
+        src={imageUrl ?? `${ASSET_CDN}/web/universalFarms/empty_list_bunny.png`}
+      />
+      <Text fontSize="14px" color="textSubtle" textAlign="center">
+        {text}
+      </Text>
+      {!account ? <ConnectWalletButton /> : null}
+    </FlexGap>
+  )
+}
 
 const allChainIds = MAINNET_CHAINS.map((chain) => chain.id)
 const NUMBER_OF_FARMS_VISIBLE = 10
