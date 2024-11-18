@@ -48,6 +48,7 @@ import { usePoolsWithMultiChains } from 'hooks/v3/usePools'
 import { PositionDetail } from 'state/farmsV4/state/accountPositions/type'
 import { V3_MIGRATION_SUPPORTED_CHAINS } from 'config/constants/supportChains'
 import { useIntersectionObserver } from '@pancakeswap/hooks'
+import ConnectWalletButton from 'components/ConnectWalletButton'
 import {
   Card,
   IPoolsFilterPanelProps,
@@ -318,6 +319,7 @@ const EmptyListPlaceholder = ({ text, imageUrl }: { text: string; imageUrl?: str
     <Text fontSize="14px" color="textSubtle" textAlign="center">
       {text}
     </Text>
+    <ConnectWalletButton />
   </FlexGap>
 )
 
