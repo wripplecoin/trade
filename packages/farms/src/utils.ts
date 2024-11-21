@@ -24,9 +24,12 @@ type LegacyClassicFarmConfig = Omit<SerializedClassicFarmConfig, 'pid'> & { chai
   pid?: number
 }
 type LegacyV3FarmConfig = ComputedFarmConfigV3 & { chainId: ChainId; version: 2 | 3 }
-export function formatUniversalFarmToSerializedFarm(farms: UniversalFarmConfig[]): Array<LegacyFarmConfig> {
-  return farms
-    .map((farm) => {
+
+export async function formatUniversalFarmToSerializedFarm(
+  farms: UniversalFarmConfig[],
+): Promise<Array<LegacyFarmConfig>> {
+  const formattedFarms = await Promise.all(
+    farms.map(async (farm) => {
       switch (farm.protocol) {
         case 'stable':
           return formatStableUniversalFarmToSerializedFarm(farm as UniversalFarmConfigStableSwap)
@@ -37,36 +40,45 @@ export function formatUniversalFarmToSerializedFarm(farms: UniversalFarmConfig[]
         default:
           return undefined
       }
-    })
-    .filter((farm): farm is LegacyFarmConfig => farm !== undefined)
+    }),
+  )
+
+  return formattedFarms.filter((farm): farm is LegacyFarmConfig => farm !== undefined)
 }
 
-const formatStableUniversalFarmToSerializedFarm = (
+const formatStableUniversalFarmToSerializedFarm = async (
   farm: UniversalFarmConfigStableSwap,
-): LegacyStableFarmConfig | undefined => {
+): Promise<LegacyStableFarmConfig | undefined> => {
   const { chainId, lpAddress, pid, token0, token1, stableSwapAddress, bCakeWrapperAddress } = farm
-  const stablePair = getStableSwapPools(chainId).find((pair) => {
-    return pair.stableSwapAddress?.toLowerCase() === stableSwapAddress?.toLowerCase()
-  })
 
-  if (!stablePair) {
-    console.warn(`Could not find stable pair for farm with stableSwapAddress ${stableSwapAddress}`)
+  try {
+    const stablePools = await getStableSwapPools(chainId)
+    const stablePair = stablePools.find(
+      (pair) => pair.stableSwapAddress?.toLowerCase() === stableSwapAddress?.toLowerCase(),
+    )
+
+    if (!stablePair) {
+      console.warn(`Could not find stable pair for farm with stableSwapAddress ${stableSwapAddress}`)
+      return undefined
+    }
+
+    return {
+      pid,
+      lpAddress,
+      lpSymbol: `${token0.symbol}-${token1.symbol} LP`,
+      token: token0,
+      quoteToken: token1,
+      stableSwapAddress,
+      stableLpFee: stablePair.stableLpFee,
+      stableLpFeeRateOfTotalFee: stablePair.stableLpFeeRateOfTotalFee,
+      infoStableSwapAddress: stablePair.infoStableSwapAddress,
+      bCakeWrapperAddress,
+      chainId,
+      version: 2,
+    }
+  } catch (error) {
+    console.error('Failed to fetch stable swap pools:', error)
     return undefined
-  }
-
-  return {
-    pid,
-    lpAddress,
-    lpSymbol: `${token0.symbol}-${token1.symbol} LP`,
-    token: token0,
-    quoteToken: token1,
-    stableSwapAddress,
-    stableLpFee: stablePair.stableLpFee,
-    stableLpFeeRateOfTotalFee: stablePair.stableLpFeeRateOfTotalFee,
-    infoStableSwapAddress: stablePair.infoStableSwapAddress,
-    bCakeWrapperAddress,
-    chainId,
-    version: 2,
   }
 }
 

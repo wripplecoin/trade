@@ -78,10 +78,14 @@ export const useV3PoolsLength = (chainIds: number[]) => {
     queryFn: async () => {
       const results = await Promise.all(
         chainIds.map(async (chainId) => {
+          const masterChefAddress = masterChefV3Addresses[chainId]
+          if (!masterChefAddress) {
+            return { chainId, length: 0 }
+          }
           const client = publicClient({ chainId })
           try {
             const poolLength = await client.readContract({
-              address: masterChefV3Addresses[chainId],
+              address: masterChefAddress,
               abi: masterChefV3ABI,
               functionName: 'poolLength',
             })
@@ -121,10 +125,14 @@ export const useV2PoolsLength = (chainIds: number[]) => {
     queryFn: async () => {
       const results = await Promise.all(
         chainIds.map(async (chainId) => {
+          const masterChefAddress = masterChefAddresses[chainId]
+          if (!masterChefAddress) {
+            return { chainId, length: 0 }
+          }
           const client = publicClient({ chainId })
           try {
             const poolLength = await client.readContract({
-              address: masterChefAddresses[chainId],
+              address: masterChefAddress,
               abi: masterChefV2ABI,
               functionName: 'poolLength',
             })

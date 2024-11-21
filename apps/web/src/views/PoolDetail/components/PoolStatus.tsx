@@ -1,12 +1,13 @@
+import { ChainId } from '@pancakeswap/chains'
 import { useTranslation } from '@pancakeswap/localization'
-import { LegacyRouter } from '@pancakeswap/smart-router/legacy-router'
 import { AutoColumn, AutoRow, Card, CardBody, Column, Text } from '@pancakeswap/uikit'
 import BigNumber from 'bignumber.js'
 import { useMemo } from 'react'
+import { useStableSwapPairsByChainId } from 'state/farmsV4/state/accountPositions/hooks'
 import { PoolInfo } from 'state/farmsV4/state/type'
+import { isAddressEqual } from 'utils'
 import { getLpFeesAndApr } from 'utils/getLpFeesAndApr'
 import { getPercentChange } from 'utils/infoDataHelpers'
-import { isAddressEqual } from 'utils'
 import { Address } from 'viem'
 import { formatDollarAmount } from 'views/V3Info/utils/numbers'
 import { ChangePercent } from './ChangePercent'
@@ -17,6 +18,7 @@ type PoolStatusProps = {
 }
 export const PoolStatus: React.FC<PoolStatusProps> = ({ poolInfo }) => {
   const { t } = useTranslation()
+  const pairs = useStableSwapPairsByChainId(poolInfo?.chainId ?? ChainId.BSC)
 
   const tvlChange = useMemo(() => {
     if (!poolInfo) return null
@@ -31,6 +33,7 @@ export const PoolStatus: React.FC<PoolStatusProps> = ({ poolInfo }) => {
     const volBefore = poolInfo.vol48hUsd ? parseFloat(poolInfo.vol48hUsd) - volNow : 0
     return getPercentChange(volNow, volBefore)
   }, [poolInfo])
+
   const fee24hUsd = useMemo(() => {
     if (!poolInfo) return 0
     if (poolInfo.fee24hUsd) {
@@ -45,14 +48,14 @@ export const PoolStatus: React.FC<PoolStatusProps> = ({ poolInfo }) => {
       return lpFees24h
     }
 
-    const stablePair = LegacyRouter.stableSwapPairsByChainId[poolInfo.chainId].find((pair) => {
+    const stablePair = pairs.find((pair) => {
       return isAddressEqual(pair.stableSwapAddress, poolInfo?.stableSwapAddress as Address)
     })
 
     if (!stablePair) return 0
 
     return new BigNumber(stablePair.stableTotalFee).times(poolInfo.vol24hUsd ?? 0).toNumber()
-  }, [poolInfo])
+  }, [pairs, poolInfo])
 
   if (!poolInfo) {
     return null

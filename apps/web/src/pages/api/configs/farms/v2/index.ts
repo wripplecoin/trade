@@ -11,7 +11,7 @@ const handler: NextApiHandler = async (req, res) => {
     const fetchFarmConfig = await fetchAllUniversalFarms()
     const includeTestnet = !!req.query.includeTestnet
     const farmConfig = includeTestnet ? [...fetchFarmConfig, ...UNIVERSAL_FARMS_WITH_TESTNET] : fetchFarmConfig
-    const legacyFarmConfig = formatUniversalFarmToSerializedFarm(farmConfig)
+    const legacyFarmConfig = await formatUniversalFarmToSerializedFarm(farmConfig)
     // cache for long time, it should revalidate on every deployment
     res.setHeader('Cache-Control', `max-age=10800, s-maxage=31536000`)
 

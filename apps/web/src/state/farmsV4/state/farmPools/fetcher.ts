@@ -85,50 +85,52 @@ export const fetchFarmPools = async (
   })
   const remoteMissedPoolsIndex: number[] = []
 
-  const finalPools = localPools.map((farm, index) => {
-    const pool = remotePools?.find((p) => {
-      return (
-        p.chainId === farm.chainId &&
-        isAddressEqual(p.lpAddress, farm.lpAddress) &&
-        p.protocol === farm.protocol &&
-        (p.protocol === Protocol.V3 ? p.pid === farm.pid : true)
-      )
-    })
+  const finalPools = await Promise.all(
+    localPools.map(async (farm, index) => {
+      const pool = remotePools?.find((p) => {
+        return (
+          p.chainId === farm.chainId &&
+          isAddressEqual(p.lpAddress, farm.lpAddress) &&
+          p.protocol === farm.protocol &&
+          (p.protocol === Protocol.V3 ? p.pid === farm.pid : true)
+        )
+      })
 
-    if (pool) {
+      if (pool) {
+        return {
+          ...pool,
+          pid: farm.pid,
+          feeTierBase: 1_000_000,
+          ...(farm.protocol === 'v2' || farm.protocol === 'stable'
+            ? { bCakeWrapperAddress: farm.bCakeWrapperAddress }
+            : {}),
+        } satisfies PoolInfo
+      }
+
+      remoteMissedPoolsIndex.push(index)
+
+      let stablePair
+      if (farm.protocol === Protocol.STABLE) {
+        const stablePools = await getStableSwapPools(farm.chainId)
+        stablePair = stablePools.find((p) => isAddressEqual(p.lpAddress, farm.lpAddress))
+      }
+
+      let feeTier = 100
+      if (farm.protocol === Protocol.V3) feeTier = Number(farm.feeAmount)
+      if (farm.protocol === Protocol.V2) feeTier = FeeAmount.MEDIUM
+      if (stablePair) feeTier = stablePair.stableTotalFee * 1_000_000
+
       return {
-        ...pool,
+        ...farm,
         pid: farm.pid,
+        tvlUsd: undefined,
+        vol24hUsd: undefined,
+        feeTier,
         feeTierBase: 1_000_000,
-        ...(farm.protocol === 'v2' || farm.protocol === 'stable'
-          ? { bCakeWrapperAddress: farm.bCakeWrapperAddress }
-          : {}),
+        isFarming: true,
       } satisfies PoolInfo
-    }
-
-    remoteMissedPoolsIndex.push(index)
-
-    const stablePair =
-      farm.protocol === Protocol.STABLE
-        ? getStableSwapPools(farm.chainId).find((p) => {
-            return isAddressEqual(p.lpAddress, farm.lpAddress)
-          })
-        : undefined
-    let feeTier = 100
-    if (farm.protocol === Protocol.V3) feeTier = Number(farm.feeAmount)
-    if (farm.protocol === Protocol.V2) feeTier = FeeAmount.MEDIUM
-    if (stablePair) feeTier = stablePair.stableTotalFee * 1_000_000
-
-    return {
-      ...farm,
-      pid: farm.pid,
-      tvlUsd: undefined,
-      vol24hUsd: undefined,
-      feeTier,
-      feeTierBase: 1_000_000,
-      isFarming: true,
-    } satisfies PoolInfo
-  })
+    }),
+  )
 
   // fetch ss fee
   // await

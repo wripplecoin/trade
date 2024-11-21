@@ -43,7 +43,7 @@ type V4ClPoolMeta = PoolMeta & {
 
 export const getV4ClPoolsWithoutTicks = createOnChainPoolFactory<V4ClPool, V4ClPoolMeta>({
   abi: CLPoolManager,
-  getPossiblePoolMetas: ([currencyA, currencyB]) => {
+  getPossiblePoolMetas: async ([currencyA, currencyB]) => {
     const [currency0, currency1] = sortCurrencies([currencyA, currencyB])
     const metas: V4ClPoolMeta[] = []
     for (const { fee, tickSpacing } of CL_PRESETS) {

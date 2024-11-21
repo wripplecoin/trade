@@ -13,6 +13,7 @@ export async function getLegacyFarmConfig(chainId?: ChainId): Promise<Serialized
     try {
       const config = await import(`./farms/${chainName}.ts`)
       let universalConfig: UniversalFarmConfig[] = await fetchUniversalFarms(chainId)
+      const stablePools = chainId ? await getStableSwapPools(chainId) : []
       // eslint-disable-next-line prefer-destructuring
       const legacyFarmConfig: SerializedFarmConfig[] = config.legacyFarmConfig
       if (legacyFarmConfig && legacyFarmConfig.length > 0) {
@@ -29,9 +30,7 @@ export async function getLegacyFarmConfig(chainId?: ChainId): Promise<Serialized
         ?.map((farm) => {
           const stablePair =
             farm.protocol === 'stable'
-              ? getStableSwapPools(chainId).find((s) => {
-                  return s.lpAddress?.toLowerCase() === farm.lpAddress?.toLowerCase()
-                })
+              ? stablePools.find((s) => s.lpAddress?.toLowerCase() === farm.lpAddress?.toLowerCase())
               : undefined
           const bCakeWrapperAddress = 'bCakeWrapperAddress' in farm ? farm.bCakeWrapperAddress : undefined
 

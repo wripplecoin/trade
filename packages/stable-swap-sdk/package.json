@@ -32,6 +32,7 @@
     "@pancakeswap/token-lists": "workspace:*",
     "@pancakeswap/tsconfig": "workspace:*",
     "@pancakeswap/utils": "workspace:*",
+    "@pancakeswap/sdk": "workspace:*",
     "tsup": "^6.7.0",
     "viem": "catalog:"
   },

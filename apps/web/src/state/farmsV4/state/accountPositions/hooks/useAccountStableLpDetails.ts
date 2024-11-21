@@ -1,8 +1,8 @@
 import { LegacyRouter } from '@pancakeswap/smart-router/legacy-router'
 import { useQuery } from '@tanstack/react-query'
 import { SLOW_INTERVAL } from 'config/constants'
-import { Address } from 'viem'
 import { useMemo } from 'react'
+import { Address } from 'viem'
 import { getStablePairDetails } from '../fetcher'
 import { StableLPDetail } from '../type'
 import { useLatestTxReceipt } from './useLatestTxReceipt'
@@ -17,7 +17,7 @@ export const useAccountStableLpDetails = (chainIds: number[], account?: Address 
       if (!account) return []
       const results = await Promise.all(
         chainIds.map(async (chainId) => {
-          const stablePairs = LegacyRouter.stableSwapPairsByChainId[chainId]
+          const stablePairs = await LegacyRouter.getStableSwapPairs(chainId)
           if (!stablePairs || stablePairs.length === 0) return []
           try {
             const details = await getStablePairDetails(chainId, account, stablePairs)

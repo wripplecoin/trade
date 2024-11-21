@@ -43,7 +43,7 @@ type V4BinPoolMeta = PoolMeta & {
 
 export const getV4BinPoolsWithoutBins = createOnChainPoolFactory<V4BinPool, V4BinPoolMeta>({
   abi: BinPoolManager,
-  getPossiblePoolMetas: ([currencyA, currencyB]) => {
+  getPossiblePoolMetas: async ([currencyA, currencyB]) => {
     const [currency0, currency1] = sortCurrencies([currencyA, currencyB])
     const metas: V4BinPoolMeta[] = []
     for (const { fee, binStep } of BIN_PRESETS) {

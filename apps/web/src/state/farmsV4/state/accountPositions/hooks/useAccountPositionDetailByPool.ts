@@ -1,7 +1,7 @@
 import { Protocol } from '@pancakeswap/farms'
-import { LegacyRouter } from '@pancakeswap/smart-router/legacy-router'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
+import { useStableSwapPairsByChainId } from 'state/farmsV4/state/accountPositions/hooks'
 import { isAddressEqual } from 'utils'
 import { Address } from 'viem'
 import { PoolInfo } from '../../type'
@@ -26,6 +26,7 @@ export const useAccountPositionDetailByPool = <TProtocol extends keyof PoolPosit
     const { token0, token1 } = poolInfo
     return [token0.wrapped, token1.wrapped]
   }, [poolInfo])
+  const pairs = useStableSwapPairsByChainId(chainId)
   const protocol = useMemo(() => poolInfo?.protocol, [poolInfo])
   const queryFn = useCallback(async () => {
     if (protocol === 'v2') {
@@ -36,7 +37,7 @@ export const useAccountPositionDetailByPool = <TProtocol extends keyof PoolPosit
       )
     }
     if (protocol === 'stable') {
-      const stablePair = LegacyRouter.stableSwapPairsByChainId[chainId].find((pair) => {
+      const stablePair = pairs.find((pair) => {
         return isAddressEqual(pair.stableSwapAddress, poolInfo?.stableSwapAddress as Address)
       })
       return getStablePairDetails(chainId, account!, stablePair ? [stablePair] : [])
@@ -45,7 +46,8 @@ export const useAccountPositionDetailByPool = <TProtocol extends keyof PoolPosit
       return getAccountV3Positions(chainId, account!)
     }
     return Promise.resolve([])
-  }, [account, chainId, currency0, currency1, poolInfo, protocol])
+  }, [account, chainId, currency0, currency1, pairs, poolInfo, protocol])
+
   const select = useCallback(
     (data) => {
       if (protocol === 'v3') {
@@ -73,7 +75,7 @@ export const useAccountPositionDetailByPool = <TProtocol extends keyof PoolPosit
   return useQuery({
     queryKey: ['accountPosition', account, chainId, poolInfo?.lpAddress, latestTxReceipt?.blockHash],
     queryFn,
-    enabled: Boolean(account && poolInfo?.lpAddress),
+    enabled: Boolean(account && poolInfo?.lpAddress && pairs.length),
     select,
   })
 }
