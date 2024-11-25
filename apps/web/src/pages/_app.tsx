@@ -4,6 +4,7 @@ import { SentryErrorBoundary } from 'components/ErrorBoundary'
 import GlobalCheckClaimStatus from 'components/GlobalCheckClaimStatus'
 import { PageMeta } from 'components/Layout/Page'
 import { AffiliateExpiredModal } from 'components/Modal/AffiliateExpiredModal'
+import { AffiliateSunsetModal } from 'components/Modal/AffiliateSunsetModal'
 import { NetworkModal } from 'components/NetworkModal'
 import { FixedSubgraphHealthIndicator } from 'components/SubgraphHealthIndicator/FixedSubgraphHealthIndicator'
 import TransactionsDetailModal from 'components/TransactionDetailModal'
@@ -196,6 +197,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
       {isShowV4IconButton && <V4CakeIcon />}
       <ZKSyncAirdropModalWithAutoPopup />
       <AffiliateExpiredModal />
+      <AffiliateSunsetModal />
       <VercelToolbar />
     </ProductionErrorBoundary>
   )

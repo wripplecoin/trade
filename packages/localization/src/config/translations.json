@@ -3631,5 +3631,10 @@
   "Try out Limit Orders": "Try out Limit Orders",
   "Stay safe": "Stay safe",
   "Slippage % controls the gap between the expected receiving amount and the minimum guaranteed amount of a swap. High volatility may require adjusting slippage tolerance in settings to successfully complete a swap.": "Slippage % controls the gap between the expected receiving amount and the minimum guaranteed amount of a swap. High volatility may require adjusting slippage tolerance in settings to successfully complete a swap.",
-  "Always double-check the token contract addresses against trusted sources before swapping to avoid scams. Pay attention to the token risk scanning if appeared.": "Always double-check the token contract addresses against trusted sources before swapping to avoid scams. Pay attention to the token risk scanning if appeared."
+  "Always double-check the token contract addresses against trusted sources before swapping to avoid scams. Pay attention to the token risk scanning if appeared.": "Always double-check the token contract addresses against trusted sources before swapping to avoid scams. Pay attention to the token risk scanning if appeared.",
+  "Important Update: Closure of the PancakeSwap Affiliate Program": "Important Update: Closure of the PancakeSwap Affiliate Program",
+  "The PancakeSwap Affiliate Program will officially close on %time%": "The PancakeSwap Affiliate Program will officially close on %time%",
+  "Please %claim% any pending trading discounts before this date, as discount redemptions will no longer be available after that.": "Please %claim% any pending trading discounts before this date, as discount redemptions will no longer be available after that.",
+  "If you were referred by an affiliate who enabled commission sharing, please note that trading discounts from their referral link ended on November 25, 2024, and you will no longer receive discounts from this date onwards.": "If you were referred by an affiliate who enabled commission sharing, please note that trading discounts from their referral link ended on November 25, 2024, and you will no longer receive discounts from this date onwards.",
+  "Thank you for your understanding and being a valued PancakeSwap community member.": "Thank you for your understanding and being a valued PancakeSwap community member."
 }
