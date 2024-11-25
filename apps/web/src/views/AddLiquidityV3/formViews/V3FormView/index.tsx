@@ -62,7 +62,7 @@ import { useSendTransaction, useWalletClient } from 'wagmi'
 
 import { transactionErrorToUserReadableMessage } from 'utils/transactionErrorToUserReadableMessage'
 import { useDensityChartData } from 'views/AddLiquidityV3/hooks/useDensityChartData'
-import { InitDepositToken, ZapLiquidityWidget } from 'components/ZapLiquidityWidget'
+import { ZapLiquidityWidget } from 'components/ZapLiquidityWidget'
 import { ZAP_V3_POOL_ADDRESSES } from 'config/constants/zapV3'
 import LockedDeposit from './components/LockedDeposit'
 import { PositionPreview } from './components/PositionPreview'
@@ -243,7 +243,7 @@ export default function V3FormView({
     [dependentField]: parsedAmounts[dependentField]?.toSignificant(6) ?? '',
   }
 
-  //   // get the max amounts user can add
+  // Get the max amounts user can add
   const maxAmounts: { [field in Field]?: CurrencyAmount<Currency> } = useMemo(
     () =>
       [Field.CURRENCY_A, Field.CURRENCY_B].reduce((accumulator, field) => {
@@ -274,76 +274,82 @@ export default function V3FormView({
 
   const onAdd = useCallback(async () => {
     logGTMClickAddLiquidityConfirmEvent()
-    if (!chainId || !signer || !account || !nftPositionManagerAddress) return
 
-    if (!positionManager || !baseCurrency || !quoteCurrency) {
+    if (
+      !chainId ||
+      !signer ||
+      !account ||
+      !nftPositionManagerAddress ||
+      !positionManager ||
+      !baseCurrency ||
+      !quoteCurrency ||
+      !position ||
+      !deadline
+    )
       return
-    }
 
     if (position?.liquidity === 0n) {
       setTxnErrorMessage(t('The liquidity of this position is 0. Please try increasing the amount.'))
       return
     }
 
-    if (position && account && deadline) {
-      const useNative = baseCurrency.isNative ? baseCurrency : quoteCurrency.isNative ? quoteCurrency : undefined
+    const useNative = baseCurrency.isNative ? baseCurrency : quoteCurrency.isNative ? quoteCurrency : undefined
 
-      const { calldata, value } = NonfungiblePositionManager.addCallParameters(position, {
-        slippageTolerance: basisPointsToPercent(allowedSlippage),
-        recipient: account,
-        deadline: deadline.toString(),
-        useNative,
-        createPool: noLiquidity,
-      })
+    const { calldata, value } = NonfungiblePositionManager.addCallParameters(position, {
+      slippageTolerance: basisPointsToPercent(allowedSlippage),
+      recipient: account,
+      deadline: deadline.toString(),
+      useNative,
+      createPool: noLiquidity,
+    })
 
-      setAttemptingTxn(true)
-      const txn = {
-        data: calldata,
-        to: nftPositionManagerAddress,
-        value: hexToBigInt(value),
-        account,
-      }
-      getViemClients({ chainId })
-        ?.estimateGas(txn)
-        .then((gas) => {
-          sendTransactionAsync({
-            ...txn,
-            gas: calculateGasMargin(gas),
-          })
-            .then((hash) => {
-              logGTMAddLiquidityTxSentEvent()
-              const baseAmount = formatRawAmount(
-                parsedAmounts[Field.CURRENCY_A]?.quotient?.toString() ?? '0',
-                baseCurrency.decimals,
-                4,
-              )
-              const quoteAmount = formatRawAmount(
-                parsedAmounts[Field.CURRENCY_B]?.quotient?.toString() ?? '0',
-                quoteCurrency.decimals,
-                4,
-              )
-
-              setAttemptingTxn(false)
-              addTransaction(
-                { hash },
-                {
-                  type: 'add-liquidity-v3',
-                  summary: `Add ${baseAmount} ${baseCurrency?.symbol} and ${quoteAmount} ${quoteCurrency?.symbol}`,
-                },
-              )
-              setTxHash(hash)
-              onAddLiquidityCallback(hash)
-            })
-            .catch((error) => {
-              console.error('Failed to send transaction', error)
-              // we only care if the error is something _other_ than the user rejected the tx
-              if (!isUserRejected(error)) {
-                setTxnErrorMessage(transactionErrorToUserReadableMessage(error, t))
-              }
-              setAttemptingTxn(false)
-            })
-        })
+    setAttemptingTxn(true)
+    const txn = {
+      data: calldata,
+      to: nftPositionManagerAddress,
+      value: hexToBigInt(value),
+      account,
     }
+    getViemClients({ chainId })
+      ?.estimateGas(txn)
+      .then((gas) => {
+        sendTransactionAsync({
+          ...txn,
+          gas: calculateGasMargin(gas),
+        })
+          .then((hash) => {
+            logGTMAddLiquidityTxSentEvent()
+            const baseAmount = formatRawAmount(
+              parsedAmounts[Field.CURRENCY_A]?.quotient?.toString() ?? '0',
+              baseCurrency.decimals,
+              4,
+            )
+            const quoteAmount = formatRawAmount(
+              parsedAmounts[Field.CURRENCY_B]?.quotient?.toString() ?? '0',
+              quoteCurrency.decimals,
+              4,
+            )
+
+            setAttemptingTxn(false)
+            addTransaction(
+              { hash },
+              {
+                type: 'add-liquidity-v3',
+                summary: `Add ${baseAmount} ${baseCurrency?.symbol} and ${quoteAmount} ${quoteCurrency?.symbol}`,
+              },
+            )
+            setTxHash(hash)
+            onAddLiquidityCallback(hash)
+          })
+          .catch((error) => {
+            console.error('Failed to send transaction', error)
+            // we only care if the error is something _other_ than the user rejected the tx
+            if (!isUserRejected(error)) {
+              setTxnErrorMessage(transactionErrorToUserReadableMessage(error, t))
+            }
+            setAttemptingTxn(false)
+          })
+      })
   }, [
     account,
     addTransaction,
@@ -521,6 +527,10 @@ export default function V3FormView({
     [price, feeAmount, invertPrice, onBothRangeInput, baseCurrency, quoteCurrency],
   )
 
+  const handleOnZapSubmit = useCallback(() => {
+    router.push('/liquidity/positions')
+  }, [router])
+
   const {
     isLoading: isChartDataLoading,
     error: chartDataError,
@@ -593,14 +603,10 @@ export default function V3FormView({
             tickUpper={tickUpper}
             pool={pool}
             baseCurrency={baseCurrency}
+            baseCurrencyAmount={formattedAmounts[Field.CURRENCY_A]}
             quoteCurrency={quoteCurrency}
-            initDepositToken={
-              independentField === Field.CURRENCY_A ? InitDepositToken.BASE_CURRENCY : InitDepositToken.QUOTE_CURRENCY
-            }
-            initAmount={typedValue}
-            onSubmit={() => {
-              router.push('/liquidity/positions')
-            }}
+            quoteCurrencyAmount={formattedAmounts[Field.CURRENCY_B]}
+            onSubmit={handleOnZapSubmit}
           />
         )}
       </HideMedium>
@@ -817,16 +823,10 @@ export default function V3FormView({
                 tickUpper={tickUpper}
                 pool={pool}
                 baseCurrency={baseCurrency}
+                baseCurrencyAmount={formattedAmounts[Field.CURRENCY_A]}
                 quoteCurrency={quoteCurrency}
-                initDepositToken={
-                  independentField === Field.CURRENCY_A
-                    ? InitDepositToken.BASE_CURRENCY
-                    : InitDepositToken.QUOTE_CURRENCY
-                }
-                initAmount={typedValue}
-                onSubmit={() => {
-                  router.push('/liquidity/positions')
-                }}
+                quoteCurrencyAmount={formattedAmounts[Field.CURRENCY_B]}
+                onSubmit={handleOnZapSubmit}
               />
             )}
           </MediumOnly>

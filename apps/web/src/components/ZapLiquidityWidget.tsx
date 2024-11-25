@@ -1,31 +1,39 @@
 import '@kyberswap/pancake-liquidity-widgets/dist/style.css'
 import { useTranslation } from '@pancakeswap/localization'
 import { Currency } from '@pancakeswap/sdk'
-import { Flex, InfoFilledIcon, Message, MessageText, ModalContainer, ModalV2, useToast } from '@pancakeswap/uikit'
+import {
+  Flex,
+  InfoFilledIcon,
+  Message,
+  MessageText,
+  ModalContainer,
+  ModalV2,
+  useModal,
+  useToast,
+} from '@pancakeswap/uikit'
 import { Pool } from '@pancakeswap/v3-sdk'
 import { ToastDescriptionWithTx } from 'components/Toast'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import noop from 'lodash/noop'
 import dynamic from 'next/dynamic'
 import { useCallback, useMemo, useState } from 'react'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import { useTheme } from 'styled-components'
 import { getAddress } from 'viem'
 import { useWalletClient } from 'wagmi'
-
-export enum InitDepositToken {
-  BASE_CURRENCY,
-  QUOTE_CURRENCY,
-}
+import CurrencySearchModal from 'components/SearchModal/CurrencySearchModal'
+import { CommonBasesType } from 'components/SearchModal/types'
+import { isAddressEqual } from 'utils'
+import WalletModalManager from 'components/WalletModalManager'
 
 interface ZapLiquidityProps {
   tickLower?: number
   tickUpper?: number
   pool?: Pool | null
+  tokenId?: string | null
   baseCurrency?: Currency | null
+  baseCurrencyAmount?: string | null
   quoteCurrency?: Currency | null
-  initDepositToken?: InitDepositToken
-  initAmount?: string
+  quoteCurrencyAmount?: string | null
   onSubmit?: () => void
 }
 
@@ -36,14 +44,18 @@ const LiquidityWidget = dynamic(
 
 const NATIVE_CURRENCY_ADDRESS = getAddress('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
 
+const getCurrencyAddress = (currency: Currency | undefined | null): string =>
+  currency?.isNative ? NATIVE_CURRENCY_ADDRESS : currency?.wrapped?.address || ''
+
 export const ZapLiquidityWidget: React.FC<ZapLiquidityProps> = ({
   tickLower,
   tickUpper,
+  tokenId,
   pool,
   baseCurrency,
+  baseCurrencyAmount,
   quoteCurrency,
-  initDepositToken,
-  initAmount,
+  quoteCurrencyAmount,
   onSubmit,
 }) => {
   const { t } = useTranslation()
@@ -58,16 +70,42 @@ export const ZapLiquidityWidget: React.FC<ZapLiquidityProps> = ({
 
   const { toastSuccess } = useToast()
 
+  const poolAddress = useMemo(() => pool && Pool.getAddress(pool.token0, pool.token1, pool.fee), [pool])
+
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const poolAddress = useMemo(() => pool && Pool.getAddress(pool.token0, pool.token1, pool.fee), [pool])
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false)
+
+  const [depositTokens, setDepositTokens] = useState<string>('')
+
+  const [amounts, setAmounts] = useState<string>('')
+
+  const handleWalletModalOnDismiss = useCallback(() => setIsWalletModalOpen(false), [])
+
+  const handleOnWalletConnect = useCallback(() => setIsWalletModalOpen(true), [])
+
+  const handleOnClick = useCallback(() => {
+    setDepositTokens(
+      [
+        baseCurrencyAmount && baseCurrencyAmount !== '0' ? getCurrencyAddress(baseCurrency) : '',
+        quoteCurrencyAmount && quoteCurrencyAmount !== '0' ? getCurrencyAddress(quoteCurrency) : '',
+      ]
+        .filter(Boolean)
+        .join(','),
+    )
+    setAmounts(
+      [
+        baseCurrencyAmount && baseCurrencyAmount !== '0' ? baseCurrencyAmount : '',
+        quoteCurrencyAmount && quoteCurrencyAmount !== '0' ? quoteCurrencyAmount : '',
+      ]
+        .filter(Boolean)
+        .join(','),
+    )
+    setIsModalOpen(true)
+  }, [baseCurrency, quoteCurrency, baseCurrencyAmount, quoteCurrencyAmount])
 
   const handleOnDismiss = useCallback(() => {
     setIsModalOpen(false)
-  }, [])
-
-  const handleOnClick = useCallback(() => {
-    setIsModalOpen(true)
   }, [])
 
   const handleTransaction = useCallback(
@@ -90,12 +128,78 @@ export const ZapLiquidityWidget: React.FC<ZapLiquidityProps> = ({
     [addTransaction, baseCurrency?.symbol, quoteCurrency?.symbol, t, toastSuccess, onSubmit],
   )
 
+  const handleSelectToken = useCallback(
+    (token: Currency) => {
+      const selectedTokenAddress = getCurrencyAddress(token)
+      const indexOfToken = depositTokens
+        .split(',')
+        .findIndex((depositToken) => isAddressEqual(depositToken, selectedTokenAddress))
+
+      if (indexOfToken > -1) return
+      setDepositTokens(depositTokens ? `${depositTokens},${selectedTokenAddress}` : `${selectedTokenAddress}`)
+      setAmounts(amounts ? `${amounts},` : '')
+    },
+    [depositTokens, amounts],
+  )
+
+  const handleAmountChange = useCallback(
+    (tokenAddress: string, amount: string) => {
+      const indexOfToken = depositTokens
+        .split(',')
+        .findIndex((depositToken) => isAddressEqual(depositToken, tokenAddress))
+      if (indexOfToken === -1) return
+
+      const amountList = amounts.split(',')
+      amountList[indexOfToken] = amount
+      setAmounts(amountList.join(','))
+    },
+    [amounts, depositTokens],
+  )
+
+  const handleAddTokens = useCallback(
+    (tokenAddresses: string) => {
+      setDepositTokens(depositTokens ? `${depositTokens},${tokenAddresses}` : tokenAddresses)
+      const amountsToAdd = tokenAddresses
+        .split('')
+        .filter((item) => item === ',')
+        .join('')
+      setAmounts(amounts ? `${amounts},${amountsToAdd}` : amountsToAdd)
+    },
+    [amounts, depositTokens],
+  )
+
+  const handleRemoveToken = useCallback(
+    (tokenAddress: string) => {
+      const tokens = depositTokens.split(',')
+      const indexOfToken = tokens.findIndex((depositToken) => isAddressEqual(depositToken, tokenAddress))
+      if (indexOfToken === -1) return
+
+      tokens.splice(indexOfToken, 1)
+      setDepositTokens(tokens.join(','))
+      const amountList = amounts.split(',')
+      amountList.splice(indexOfToken, 1)
+      setAmounts(amountList.join(','))
+    },
+    [amounts, depositTokens],
+  )
+
+  const [onPresentCurrencyModal] = useModal(
+    <CurrencySearchModal
+      onCurrencySelect={handleSelectToken}
+      commonBasesType={CommonBasesType.LIQUIDITY}
+      mode="zap-currency"
+      showCommonBases
+      showCurrencyInHeader
+      showSearchInput
+    />,
+  )
+
   return (
     <>
       <Message variant="primary" padding="8px" icon={<InfoFilledIcon color="secondary" />}>
         <Flex flexDirection="column" style={{ gap: 8 }}>
           <MessageText lineHeight="120%" fontSize={16}>
-            {t('Only have one token? Try Zap to automatically balance and provide V3 liquidity in one click.')}
+            {t('Try Zap to automatically balance and provide V3 liquidity in one click.')}
           </MessageText>
           <span
             onClick={handleOnClick}
@@ -109,29 +213,26 @@ export const ZapLiquidityWidget: React.FC<ZapLiquidityProps> = ({
           </span>
         </Flex>
       </Message>
-
+      <WalletModalManager isOpen={isWalletModalOpen} onDismiss={handleWalletModalOnDismiss} />
       <ModalV2 closeOnOverlayClick isOpen={isModalOpen} onDismiss={handleOnDismiss}>
         <ModalContainer style={{ maxHeight: '90vh', overflow: 'auto' }}>
           <LiquidityWidget
             feeAddress="0xB82bb6Ce9A249076Ca7135470e7CA634806De168"
             feePcm={0}
-            onConnectWallet={noop}
+            onConnectWallet={handleOnWalletConnect}
             walletClient={walletClient}
             account={account ?? undefined}
             networkChainId={chainId}
             chainId={chainId}
             initTickLower={tickLower ? +tickLower : undefined}
             initTickUpper={tickUpper ? +tickUpper : undefined}
-            initAmount={initAmount ? +initAmount : undefined}
-            initDepositToken={
-              initDepositToken === InitDepositToken.BASE_CURRENCY
-                ? baseCurrency?.isNative
-                  ? NATIVE_CURRENCY_ADDRESS
-                  : baseCurrency?.wrapped?.address
-                : quoteCurrency?.isNative
-                ? NATIVE_CURRENCY_ADDRESS
-                : quoteCurrency?.wrapped?.address
-            }
+            positionId={tokenId || undefined}
+            initAmounts={amounts}
+            initDepositTokens={depositTokens}
+            onAddTokens={handleAddTokens}
+            onRemoveToken={handleRemoveToken}
+            onAmountChange={handleAmountChange}
+            onOpenTokenSelectModal={onPresentCurrencyModal}
             poolAddress={poolAddress ?? '0x'}
             theme={isDark ? 'dark' : 'light'}
             onDismiss={handleOnDismiss}

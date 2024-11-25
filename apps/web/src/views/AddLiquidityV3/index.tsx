@@ -150,12 +150,13 @@ export function UniversalAddLiquidity({
     (currencyANew: Currency) => {
       const [idA, idB] = handleCurrencySelect(currencyANew, currencyIdB)
       const newPathname = router.pathname.replace('/v2', '').replace('/stable', '')
+      const { minPrice, maxPrice, ...rest } = router.query
       if (idB === undefined) {
         router.replace(
           {
             pathname: newPathname,
             query: {
-              ...router.query,
+              ...rest,
               currency: [idA!],
             },
           },
@@ -167,7 +168,7 @@ export function UniversalAddLiquidity({
           {
             pathname: newPathname,
             query: {
-              ...router.query,
+              ...rest,
               currency: [idA!, idB!],
             },
           },
@@ -183,12 +184,13 @@ export function UniversalAddLiquidity({
     (currencyBNew: Currency) => {
       const [idB, idA] = handleCurrencySelect(currencyBNew, currencyIdA)
       const newPathname = router.pathname.replace('/v2', '').replace('/stable', '')
+      const { minPrice, maxPrice, ...rest } = router.query
       if (idA === undefined) {
         router.replace(
           {
             pathname: newPathname,
             query: {
-              ...router.query,
+              ...rest,
               currency: [idB!],
             },
           },
@@ -200,7 +202,7 @@ export function UniversalAddLiquidity({
           {
             pathname: newPathname,
             query: {
-              ...router.query,
+              ...rest,
               currency: [idA!, idB!],
             },
           },
