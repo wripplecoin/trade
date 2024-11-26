@@ -23,6 +23,13 @@
       "address": "0xa7192e74A09Ccae2284a5FbD71c983948A6075a6",
       "chainId": 56,
       "decimals": 9
+    },
+    {
+      "name": "Giggle Academy",
+      "symbol": "Giggle",
+      "address": "0xB265cBa9bd6e34FA412bD8b4C1514C902C0e7E7d",
+      "chainId": 56,
+      "decimals": 18
     }
   ]
 }
