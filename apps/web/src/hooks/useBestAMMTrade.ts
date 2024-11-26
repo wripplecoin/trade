@@ -869,25 +869,32 @@ function createUseWorkerGetBestTrade() {
         })
 
         const quoterConfig = (quoteProvider as ReturnType<typeof SmartRouter.createQuoteProvider>)?.getConfig?.()
-        const result = await worker.getBestTrade({
-          chainId: currency.chainId,
-          currency: SmartRouter.Transformer.serializeCurrency(currency),
-          tradeType,
-          amount: {
-            currency: SmartRouter.Transformer.serializeCurrency(amount.currency),
-            value: amount.quotient.toString(),
-          },
-          gasPriceWei: typeof gasPriceWei !== 'function' ? gasPriceWei?.toString() : undefined,
-          maxHops,
-          maxSplits,
-          poolTypes: allowedPoolTypes,
-          candidatePools: candidatePools.map(SmartRouter.Transformer.serializePool),
-          onChainQuoterGasLimit: quoterConfig?.gasLimit?.toString(),
-          quoteCurrencyUsdPrice,
-          nativeCurrencyUsdPrice,
-          signal,
-        })
-        return SmartRouter.Transformer.parseTrade(currency.chainId, result as any)
+        try {
+          const result = await worker.getBestTrade({
+            chainId: currency.chainId,
+            currency: SmartRouter.Transformer.serializeCurrency(currency),
+            tradeType,
+            amount: {
+              currency: SmartRouter.Transformer.serializeCurrency(amount.currency),
+              value: amount.quotient.toString(),
+            },
+            gasPriceWei: typeof gasPriceWei !== 'function' ? gasPriceWei?.toString() : undefined,
+            maxHops,
+            maxSplits,
+            poolTypes: allowedPoolTypes,
+            candidatePools: candidatePools.map(SmartRouter.Transformer.serializePool),
+            onChainQuoterGasLimit: quoterConfig?.gasLimit?.toString(),
+            quoteCurrencyUsdPrice,
+            nativeCurrencyUsdPrice,
+            signal,
+          })
+          return SmartRouter.Transformer.parseTrade(currency.chainId, result as any)
+        } catch (e) {
+          if (e === 'Cannot find a valid swap route') {
+            throw new NoValidRouteError()
+          }
+          throw e
+        }
       },
       [worker],
     )

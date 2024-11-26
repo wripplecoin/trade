@@ -55,7 +55,7 @@ export function createQuoteProvider(config: QuoterConfig): QuoteProvider<QuoterC
       routes: RouteWithoutQuote[],
       { blockNumber, gasModel, signal }: QuoterOptions,
     ): Promise<RouteWithQuote[]> {
-      const { chainId } = routes[0].input
+      const { chainId } = routes[0]?.input || {}
       const getMixedRouteQuotes = createMixedRouteQuoteFetcher(chainId)
 
       const v4ClRoutes: RouteWithoutQuote[] = []
