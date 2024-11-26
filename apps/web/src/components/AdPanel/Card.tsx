@@ -1,6 +1,7 @@
 import { Box, BoxProps, CloseIcon, IconButton, useMatchBreakpoints } from '@pancakeswap/uikit'
-import { forwardRef, useEffect, useRef } from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import isUndefinedOrNull from '@pancakeswap/utils/isUndefinedOrNull'
 import { useShowAdPanel } from './useShowAdPanel'
 
 const BaseCard = styled(Box)<{ $isExpanded?: boolean }>`
@@ -99,6 +100,7 @@ interface AdCardProps extends BoxProps {
 export const AdCard = forwardRef<HTMLDivElement, AdCardProps>(
   ({ children, imageUrl, alt, isExpanded, forceMobile, isDismissible = true, ...props }, ref) => {
     const imageRef = useRef<HTMLImageElement>(null)
+    const [isExpandTriggered, setIsExpandTriggered] = useState(false)
 
     // Drag handle, Slider and other slots will come here
     const { isDesktop } = useMatchBreakpoints()
@@ -107,22 +109,40 @@ export const AdCard = forwardRef<HTMLDivElement, AdCardProps>(
     const isMobile = forceMobile || !isDesktop
 
     useEffect(() => {
-      if (imageRef.current) {
+      if (isExpanded) {
+        setIsExpandTriggered(true)
+      }
+    }, [isExpanded])
+
+    useEffect(() => {
+      if (imageRef.current && !isUndefinedOrNull(isExpanded) && isExpandTriggered) {
         if (isExpanded) {
-          imageRef.current.animate([{ opacity: 0, zIndex: -1, transform: 'scale(0.96)' }], {
-            duration: 50,
-            fill: 'forwards',
-            easing: 'ease-in-out',
-          })
+          imageRef.current.animate(
+            [
+              { opacity: 1, zIndex: 1, transform: 'scale(1)' },
+              { opacity: 0, zIndex: -1, transform: 'scale(0.96)' },
+            ],
+            {
+              duration: 50,
+              fill: 'forwards',
+              easing: 'ease-in-out',
+            },
+          )
         } else {
-          imageRef.current.animate([{ opacity: 1, zIndex: 1, transform: 'scale(1)' }], {
-            duration: 200,
-            fill: 'forwards',
-            easing: 'ease-in-out',
-          })
+          imageRef.current.animate(
+            [
+              { opacity: 0, zIndex: -1, transform: 'scale(0.96)' },
+              { opacity: 1, zIndex: 1, transform: 'scale(1)' },
+            ],
+            {
+              duration: 200,
+              fill: 'forwards',
+              easing: 'ease-in-out',
+            },
+          )
         }
       }
-    }, [imageRef, isExpanded])
+    }, [imageRef, isExpandTriggered, isExpanded])
 
     return (
       <BaseCard $isExpanded={isExpanded} {...props} ref={ref}>
