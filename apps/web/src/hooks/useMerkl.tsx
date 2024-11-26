@@ -18,6 +18,7 @@ import { getContract } from 'utils/contractHelpers'
 import { Address } from 'viem'
 import { useWalletClient } from 'wagmi'
 import { useMasterchefV3 } from 'hooks/useContract'
+import { isAddressEqual } from 'utils'
 
 export const MERKL_API_V2 = 'https://api.angle.money/v2/merkl'
 
@@ -127,7 +128,7 @@ export function useMerklInfo(poolAddress?: string): {
     const rewardCurrencies = (rewardTokenAddresses as string[])
       .reduce<TokenInfo[]>((result, address) => {
         Object.values(lists).find((list) => {
-          const token: TokenInfo | undefined = list?.current?.tokens.find((t) => t.address === address)
+          const token: TokenInfo | undefined = list?.current?.tokens.find((t) => isAddressEqual(t.address, address))
 
           if (token) return result.push(token)
 

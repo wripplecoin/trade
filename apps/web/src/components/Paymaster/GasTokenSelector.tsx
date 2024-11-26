@@ -37,6 +37,7 @@ import { Currency } from '@pancakeswap/swap-sdk-core'
 import { watchAccount } from '@wagmi/core'
 import { DEFAULT_PAYMASTER_TOKEN, paymasterInfo, paymasterTokens } from 'config/paymaster'
 import { useGasToken } from 'hooks/useGasToken'
+import { isAddressEqual } from 'utils'
 
 // Selector Styles
 const GasTokenSelectButton = styled(Button).attrs({ variant: 'text', scale: 'xs' })`
@@ -143,7 +144,7 @@ export const GasTokenSelector = ({ currency: inputCurrency }: GasTokenSelectorPr
       // Check if input token is native ETH to avoid conflicts when WETH is selected as gas token
       !inputCurrency.isNative &&
       gasToken.isToken &&
-      inputCurrency.wrapped.address === gasToken.wrapped.address,
+      isAddressEqual(inputCurrency.wrapped.address, gasToken.wrapped.address),
     [inputCurrency, gasToken, gasTokenInfo],
   )
 

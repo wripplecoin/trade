@@ -11,6 +11,7 @@ import LiquidityFormProvider from 'views/AddLiquidityV3/formViews/V3FormView/for
 import { useCurrencyParams } from 'views/AddLiquidityV3/hooks/useCurrencyParams'
 import { SELECTOR_TYPE } from 'views/AddLiquidityV3/types'
 import { PageWithoutFAQ } from 'views/Page'
+import { isAddressEqual } from 'utils'
 
 const AddLiquidityPage = () => {
   const router = useRouter()
@@ -43,8 +44,10 @@ const AddLiquidityPage = () => {
     const hasV2Farm = farmsV2Public?.find(
       (farm) =>
         farm.multiplier !== '0X' &&
-        ((farm.token.address === currencyA.wrapped.address && farm.quoteToken.address === currencyB.wrapped.address) ||
-          (farm.token.address === currencyB.wrapped.address && farm.quoteToken.address === currencyA.wrapped.address)),
+        ((isAddressEqual(farm.token.address, currencyA.wrapped.address) &&
+          isAddressEqual(farm.quoteToken.address, currencyB.wrapped.address)) ||
+          (isAddressEqual(farm.token.address, currencyB.wrapped.address) &&
+            isAddressEqual(farm.quoteToken.address, currencyA.wrapped.address))),
     )
     return hasV2Farm
       ? isStableFarm(hasV2Farm)

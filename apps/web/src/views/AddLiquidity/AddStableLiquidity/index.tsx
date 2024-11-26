@@ -21,7 +21,7 @@ import useAccountActiveChain from 'hooks/useAccountActiveChain'
 import { useAddLiquidityV2FormState } from 'state/mint/reducer'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import { useGasPrice } from 'state/user/hooks'
-import { calculateGasMargin } from 'utils'
+import { calculateGasMargin, isAddressEqual } from 'utils'
 import { calculateSlippageAmount } from 'utils/exchange'
 import { maxAmountSpend } from 'utils/maxAmountSpend'
 import { Address } from 'viem'
@@ -206,10 +206,12 @@ export default function AddStableLiquidity({
     const quotientB = parsedAmountB?.quotient || 0n
 
     // Ensure the token order [token0, token1]
-    const tokenAmounts =
-      stableSwapConfig?.token0?.wrapped.address === parsedAmountA?.currency?.wrapped?.address
-        ? ([quotientA, quotientB] as const)
-        : ([quotientB, quotientA] as const)
+    const tokenAmounts = isAddressEqual(
+      stableSwapConfig?.token0?.wrapped.address,
+      parsedAmountA?.currency?.wrapped?.address,
+    )
+      ? ([quotientA, quotientB] as const)
+      : ([quotientB, quotientA] as const)
 
     let args_
 

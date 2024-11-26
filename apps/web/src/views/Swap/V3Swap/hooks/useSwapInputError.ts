@@ -4,7 +4,7 @@ import tryParseAmount from '@pancakeswap/utils/tryParseAmount'
 
 import { Field } from 'state/swap/actions'
 import { useSwapState } from 'state/swap/hooks'
-import { safeGetAddress } from 'utils'
+import { isAddressEqual, safeGetAddress } from 'utils'
 
 import { ClassicOrder, PriceOrder } from '@pancakeswap/price-api-sdk'
 import { isClassicOrder } from 'views/Swap/utils'
@@ -23,7 +23,9 @@ interface Balances {
  */
 function involvesAddress(trade: ClassicOrder['trade'], checksummedAddress: string): boolean {
   // TODO check for pools
-  return trade.routes.some((r) => r.path.some((token) => token.isToken && token.address === checksummedAddress))
+  return trade.routes.some((r) =>
+    r.path.some((token) => token.isToken && isAddressEqual(token.address, checksummedAddress)),
+  )
 }
 
 // TODO: update
