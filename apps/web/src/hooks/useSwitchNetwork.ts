@@ -22,7 +22,7 @@ export function useSwitchNetworkLocal() {
 
   return useCallback(
     (newChainId: number) => {
-      const { chainId, ...restQuery } = router.query
+      const { chainId: _, ...restQuery } = router.query
 
       router.replace(
         {

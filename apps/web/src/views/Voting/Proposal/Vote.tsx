@@ -64,7 +64,7 @@ const VoteComponent: React.FC<React.PropsWithChildren<VoteProps>> = ({
         setVote(newData)
       }
     }
-  }, [account])
+  }, [account, proposal, votes])
 
   const handleSuccess = async () => {
     toastSuccess(t('Vote cast!'))
