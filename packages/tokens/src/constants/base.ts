@@ -163,7 +163,7 @@ export const baseTokens = {
     ChainId.BASE,
     '0x2Da56AcB9Ea78330f947bD57C54119Debda7AF71',
     18,
-    'Mog Coin',
+    'Mog',
     'MOG',
     'https://mogcoin.xyz/',
   ),
