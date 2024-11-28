@@ -45,6 +45,7 @@ export const buyCryptoFAQConfig: FAQConfig = (t) => ({
   title: t('Quick start to Buy Crypto'),
   subtitle: t('Need Help?'),
   imageUrl: getImageUrl('faq_buy_crypto.png'),
+  alt: 'Buy crypto FAQ',
   docsUrl: 'https://docs.pancakeswap.finance/products/buy-crypto',
   data: [
     {

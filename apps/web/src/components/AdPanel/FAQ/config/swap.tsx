@@ -21,6 +21,7 @@ export const swapFAQConfig: FAQConfig = (t) => ({
   title: t('Quick start now on How to Swap!'),
   subtitle: t('Need Help?'),
   imageUrl: getImageUrl('faq_bunny.png'),
+  alt: 'FAQ bunny',
   docsUrl: 'https://docs.pancakeswap.finance/products/pancakeswap-exchange',
   data: [
     {

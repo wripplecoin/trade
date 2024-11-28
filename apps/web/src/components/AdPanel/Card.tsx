@@ -160,7 +160,7 @@ export const AdCard = forwardRef<HTMLDivElement, AdCardProps>(
           </CloseButtonContainer>
         )}
         <GraphicsContainer>
-          {imageUrl && <img ref={imageRef} src={imageUrl} alt={alt || 'Ad Image'} width={207} height={188} />}
+          {imageUrl && <img ref={imageRef} src={imageUrl} alt={alt || 'Card Image'} width={207} height={188} />}
         </GraphicsContainer>
       </BaseCard>
     )
