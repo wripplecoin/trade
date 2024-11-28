@@ -1,8 +1,8 @@
 import { useMatchBreakpoints } from '@pancakeswap/uikit'
 import { AdCakeStaking } from './Ads/AdCakeStaking'
+import { AdMevProtection } from './Ads/AdMevProtection'
 import { AdOptionsTrading } from './Ads/AdOptionsTrading'
 import { AdPCSX } from './Ads/AdPCSX'
-import { AdQuests } from './Ads/AdQuests'
 import { AdRocker } from './Ads/AdRocker'
 import { AdTelegramBot } from './Ads/AdTelegramBot'
 import { ExpandableAd } from './Expandable/ExpandableAd'
@@ -34,6 +34,10 @@ export const useAdConfig = () => {
       shouldRender: [shouldRenderOnPages(['/buy-crypto', '/', '/prediction'])],
     },
     {
+      id: 'ad-mev',
+      component: <AdMevProtection />,
+    },
+    {
       id: 'prediction-telegram-bot',
       component: <AdTelegramBot />,
     },
@@ -49,10 +53,7 @@ export const useAdConfig = () => {
       id: 'clamm-options-trading',
       component: <AdOptionsTrading />,
     },
-    {
-      id: 'ad-quest',
-      component: <AdQuests />,
-    },
+
     {
       id: 'rocker-meme-career',
       component: <AdRocker />,

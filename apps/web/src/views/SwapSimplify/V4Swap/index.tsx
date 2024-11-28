@@ -12,6 +12,7 @@ import { useMemo } from 'react'
 import { Field } from 'state/swap/actions'
 import { useSwapState } from 'state/swap/hooks'
 import { logger } from 'utils/datadog'
+import { MevToggle } from 'views/Mev/MevToggle'
 import { SwapType } from '../../Swap/types'
 import { useIsWrapping } from '../../Swap/V3Swap/hooks'
 import { useAllTypeBestTrade } from '../../Swap/V3Swap/hooks/useAllTypeBestTrade'
@@ -181,6 +182,7 @@ export function V4SwapForm() {
         }
         tradeDetails={<TradeDetails loaded={tradeLoaded} order={bestOrder} />}
         shouldRenderDetails={Boolean(executionPrice) && Boolean(bestOrder) && !isWrapping && !tradeError}
+        mevSlot={<MevToggle />}
       />
     </SwapUIV2.SwapFormWrapper>
   )

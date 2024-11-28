@@ -167,6 +167,7 @@ export { default as SafePalIcon } from "./Icons/SafePal";
 export { default as SearchIcon } from "./Icons/Search";
 export { default as SellIcon } from "./Icons/Sell";
 export { default as ShareIcon } from "./Icons/Share";
+export { ShieldIcon } from "./Icons/ShieldIcon";
 export { default as ShoppingBasketIcon } from "./Icons/ShoppingBasket";
 export { default as ShoppingBasketFilledIcon } from "./Icons/ShoppingBasketFilled";
 export { default as ShrinkIcon } from "./Icons/Shrink";
