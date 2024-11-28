@@ -30,7 +30,11 @@ const InnerWrapper = styled.div`
   gap: 40px;
 `
 const walletConfig = [
-  { title: 'Trust Wallet', image: 'trust.png', doc: 'https://trustwallet.com/' },
+  {
+    title: 'Trust Wallet',
+    image: 'trust.png',
+    doc: 'https://community.trustwallet.com/t/how-to-add-a-custom-network-on-the-trust-wallet-mobile-app/626781',
+  },
   {
     title: 'SafePal',
     image: 'safepal.png',
