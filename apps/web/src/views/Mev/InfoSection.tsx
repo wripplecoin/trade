@@ -105,7 +105,11 @@ export const InfoSection: React.FC<{ walletCount: number }> = ({ walletCount }) 
             <Text>{t('or')}</Text>
             <Button
               onClick={() => {
-                window.open('https://docs.pancakeswap.finance/', '_blank', 'noopener noreferrer')
+                window.open(
+                  'https://docs.pancakeswap.finance/products/pancakeswap-private-rpc/faq',
+                  '_blank',
+                  'noopener noreferrer',
+                )
               }}
               endIcon={<LinkExternal color={theme.colors.background} />}
             >
