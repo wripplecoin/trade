@@ -413,8 +413,7 @@ export default function IncreaseLiquidityV3({ currencyA: baseCurrency, currencyB
             assetA: currencies[Field.CURRENCY_A]?.symbol ?? '',
             assetB: currencies[Field.CURRENCY_B]?.symbol ?? '',
           })}
-          noConfig
-        />{' '}
+        />
         <CardBody>
           <Box mb="16px">
             {existingPosition && (
@@ -474,7 +473,7 @@ export default function IncreaseLiquidityV3({ currencyA: baseCurrency, currencyB
             }}
           >
             {buttons}
-            {hasZapV3Pool && hasInsufficentBalance && isStakedInMCv3 === 'false' && (
+            {hasZapV3Pool && hasInsufficentBalance && (
               <ZapLiquidityWidget
                 tokenId={tokenId}
                 pool={pool}

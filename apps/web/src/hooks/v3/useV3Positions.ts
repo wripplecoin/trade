@@ -143,7 +143,7 @@ export function useV3TokenIdsByAccount(
 
   const {
     isLoading: someTokenIdsLoading,
-    data: tokenIds = [],
+    data: tokenIds,
     refetch: refetchTokenIds,
   } = useReadContracts({
     contracts: tokenIdsArgs,
@@ -157,14 +157,14 @@ export function useV3TokenIdsByAccount(
   // check if we can remove this effect when we upgrade to the latest version of wagmi
   useEffect(() => {
     if (account) {
-      refetchBalance()
-      refetchTokenIds()
+      refetchBalance({ cancelRefetch: false })
+      refetchTokenIds({ cancelRefetch: false })
     }
   }, [account, refetchBalance, refetchTokenIds])
 
   return {
     tokenIds: useMemo(
-      () => tokenIds.map((r) => (r.status === 'success' ? r.result : null)).filter(Boolean) as bigint[],
+      () => (tokenIds?.map((r) => (r.status === 'success' ? r.result : null)).filter(Boolean) as bigint[]) ?? [],
       [tokenIds],
     ),
     loading: someTokenIdsLoading || balanceLoading,

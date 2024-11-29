@@ -24,6 +24,7 @@ import CurrencySearchModal from 'components/SearchModal/CurrencySearchModal'
 import { CommonBasesType } from 'components/SearchModal/types'
 import { isAddressEqual } from 'utils'
 import WalletModalManager from 'components/WalletModalManager'
+import { useMasterchefV3 } from 'hooks/useContract'
 
 interface ZapLiquidityProps {
   tickLower?: number
@@ -83,6 +84,10 @@ export const ZapLiquidityWidget: React.FC<ZapLiquidityProps> = ({
   const handleWalletModalOnDismiss = useCallback(() => setIsWalletModalOpen(false), [])
 
   const handleOnWalletConnect = useCallback(() => setIsWalletModalOpen(true), [])
+
+  const masterChefV3 = useMasterchefV3()
+
+  const masterChefV3Addresses = useMemo(() => (masterChefV3 ? [masterChefV3.address] : undefined), [masterChefV3])
 
   const handleOnClick = useCallback(() => {
     setDepositTokens(
@@ -217,9 +222,9 @@ export const ZapLiquidityWidget: React.FC<ZapLiquidityProps> = ({
       <ModalV2 closeOnOverlayClick isOpen={isModalOpen} onDismiss={handleOnDismiss}>
         <ModalContainer style={{ maxHeight: '90vh', overflow: 'auto' }}>
           <LiquidityWidget
+            theme={isDark ? 'dark' : 'light'}
             feeAddress="0xB82bb6Ce9A249076Ca7135470e7CA634806De168"
             feePcm={0}
-            onConnectWallet={handleOnWalletConnect}
             walletClient={walletClient}
             account={account ?? undefined}
             networkChainId={chainId}
@@ -229,12 +234,13 @@ export const ZapLiquidityWidget: React.FC<ZapLiquidityProps> = ({
             positionId={tokenId || undefined}
             initAmounts={amounts}
             initDepositTokens={depositTokens}
+            poolAddress={poolAddress ?? '0x'}
+            farmContractAddresses={masterChefV3Addresses}
+            onConnectWallet={handleOnWalletConnect}
             onAddTokens={handleAddTokens}
+            onOpenTokenSelectModal={onPresentCurrencyModal}
             onRemoveToken={handleRemoveToken}
             onAmountChange={handleAmountChange}
-            onOpenTokenSelectModal={onPresentCurrencyModal}
-            poolAddress={poolAddress ?? '0x'}
-            theme={isDark ? 'dark' : 'light'}
             onDismiss={handleOnDismiss}
             onTxSubmit={handleTransaction}
             source="pancakeswap"
