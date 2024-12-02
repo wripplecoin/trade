@@ -12,7 +12,7 @@ export const AdMevProtection = (props: AdPlayerProps) => {
   const { t } = useTranslation()
 
   return (
-    <AdCard imageUrl={getImageUrl('ad_mev.png')} {...props}>
+    <AdCard imageUrl={getImageUrl('mev')} {...props}>
       <BodyText mb="0">{t('Secure your swaps on BNB Chain with MEV guard.')}</BodyText>
       <AdButton mt="16px" href={actionLink} externalIcon>
         {t('Learn More')}

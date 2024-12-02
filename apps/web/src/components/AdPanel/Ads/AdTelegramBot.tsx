@@ -13,7 +13,7 @@ export const AdTelegramBot = (props: AdPlayerProps) => {
   const { t } = useTranslation()
 
   return (
-    <AdCard imageUrl={getImageUrl('ad_prediction_telegram_bot.png')} {...props}>
+    <AdCard imageUrl={getImageUrl('prediction_telegram_bot')} {...props}>
       <BodyText>{t('PancakeSwap Prediction Telegram Bot is now live!')}</BodyText>
 
       <AdButton mt="4px" href={actionLink} endIcon={<TelegramIcon color="invertedContrast" />} isExternalLink>

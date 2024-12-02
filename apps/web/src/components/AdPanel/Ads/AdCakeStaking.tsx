@@ -14,7 +14,7 @@ export const AdCakeStaking = (props: AdPlayerProps) => {
   const { totalApr } = useFourYearTotalVeCakeApr()
 
   return (
-    <AdCard imageUrl={getImageUrl('ad_cake_staking.png')} {...props}>
+    <AdCard imageUrl={getImageUrl('cake_staking')} {...props}>
       <BodyText mb="0">
         {t('Stake CAKE and Earn up to %apr%% APR !', {
           apr: totalApr.toFixed(2),

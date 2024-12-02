@@ -15,7 +15,7 @@ export const AdOptionsTrading = (props: AdPlayerProps) => {
   const { t } = useTranslation()
 
   return (
-    <AdCard imageUrl={getImageUrl('ad_clamm_options_trading.png')} {...props}>
+    <AdCard imageUrl={getImageUrl('clamm_options_trading')} {...props}>
       <BodyText mb="0">{t('Introducing CLAMM Options Trading.')}</BodyText>
 
       <AdButton variant="text" href={learnMoreLink} isExternalLink>

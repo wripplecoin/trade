@@ -3,7 +3,7 @@ import { FAQConfig } from '../types'
 
 export const predictionFAQConfig: FAQConfig = (t) => ({
   title: t('Quick start to Prediction (BETA)'),
-  imageUrl: getImageUrl('ad_prediction_telegram_bot.png'),
+  imageUrl: getImageUrl('ad_prediction_telegram_bot'),
   alt: 'Prediction Telegram bot',
   docsUrl: 'https://docs.pancakeswap.finance/products/prediction',
   data: [

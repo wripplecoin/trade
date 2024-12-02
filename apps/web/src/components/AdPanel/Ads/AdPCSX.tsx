@@ -15,7 +15,7 @@ export const AdPCSX = (props: AdPlayerProps) => {
   const { t } = useTranslation()
 
   return (
-    <AdCard imageUrl={getImageUrl('ad_pcsx.png')} {...props}>
+    <AdCard imageUrl={getImageUrl('pcsx')} {...props}>
       <BodyText mb="0">
         <Text as="span" color="secondary" bold>
           {t('ZERO')}

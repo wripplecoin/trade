@@ -15,7 +15,7 @@ export const AdV4 = (props: AdPlayerProps) => {
   const { t } = useTranslation()
 
   return (
-    <AdCard imageUrl={getImageUrl('ad_pcs_v4.png')} {...props}>
+    <AdCard imageUrl={getImageUrl('pcs_v4')} {...props}>
       <BodyText mb="0">{t('Introducing PancakeSwap v4')}</BodyText>
 
       <AdButton variant="text" href={whitepaperLink} isExternalLink>
