@@ -126,12 +126,10 @@ const config: (
         },
         {
           label: t('Staking'),
-          supportChainIds: SUPPORT_CAKE_STAKING,
           items: [
             {
               label: t('CAKE Staking'),
               href: '/cake-staking',
-              supportChainIds: SUPPORT_CAKE_STAKING,
             },
             {
               label: t('Syrup Pools'),

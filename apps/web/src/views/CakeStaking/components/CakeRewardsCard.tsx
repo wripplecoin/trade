@@ -36,6 +36,9 @@ import { getRevenueSharingCakePoolAddress, getRevenueSharingVeCakeAddress } from
 import { stringify } from 'viem'
 import BenefitsTooltipsText from 'views/Pools/components/RevenueSharing/BenefitsModal/BenefitsTooltipsText'
 import { timeFormat } from 'views/TradingReward/utils/timeFormat'
+import { poolStartWeekCursors } from 'views/CakeStaking/config'
+import { WEEK } from 'config/constants/veCake'
+import { useInitialBlockTimestamp } from 'state/block/hooks'
 import {
   useCakePoolEmission,
   useRevShareEmission,
@@ -427,14 +430,23 @@ const ClaimButton: React.FC<{
   const { account, chainId } = useAccountActiveChain()
   const contract = useRevenueSharingPoolGatewayContract()
   const { fetchWithCatchTxError, loading: isPending } = useCatchTxError()
+  const currentBlockTimestamp = useCurrentBlockTimestamp()
 
   const isReady = useMemo(() => new BigNumber(availableClaim).gt(0) && !isPending, [availableClaim, isPending])
 
   const handleClaim = useCallback(async () => {
     try {
-      if (!account || !chainId) return
+      if (!account || !chainId || !currentBlockTimestamp) return
 
-      const revenueSharingPools = [getRevenueSharingCakePoolAddress(chainId), getRevenueSharingVeCakeAddress(chainId)]
+      const cakePoolAddress = getRevenueSharingCakePoolAddress(chainId)
+      const cakePoolLength = Math.ceil((currentBlockTimestamp - poolStartWeekCursors[cakePoolAddress]) / WEEK / 52)
+      const veCakeAddress = getRevenueSharingVeCakeAddress(chainId)
+      const veCakePoolLength = Math.ceil((currentBlockTimestamp - poolStartWeekCursors[veCakeAddress]) / WEEK / 52)
+
+      const revenueSharingPools = [
+        ...Array(cakePoolLength).fill(cakePoolAddress),
+        ...Array(veCakePoolLength).fill(veCakeAddress),
+      ]
       const receipt = await fetchWithCatchTxError(() =>
         contract.write.claimMultiple([revenueSharingPools, account], { account, chain: contract.chain }),
       )
@@ -452,7 +464,17 @@ const ClaimButton: React.FC<{
     } catch (error) {
       console.error('[ERROR] Submit Revenue Claim Button', error)
     }
-  }, [account, chainId, contract.chain, contract.write, fetchWithCatchTxError, onDismiss, t, toastSuccess])
+  }, [
+    account,
+    chainId,
+    contract.chain,
+    contract.write,
+    fetchWithCatchTxError,
+    onDismiss,
+    t,
+    toastSuccess,
+    currentBlockTimestamp,
+  ])
 
   return (
     <Button mt="24px" width="100%" variant="subtle" disabled={!isReady} onClick={handleClaim}>

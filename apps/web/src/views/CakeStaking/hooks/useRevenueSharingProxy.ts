@@ -1,10 +1,15 @@
 import { ONE_WEEK_DEFAULT } from '@pancakeswap/pools'
 import { useQuery } from '@tanstack/react-query'
 import BigNumber from 'bignumber.js'
-import useAccountActiveChain from 'hooks/useAccountActiveChain'
-import { useInitialBlockTimestamp } from 'state/block/hooks'
 import { publicClient } from 'utils/wagmi'
-import { useRevenueSharingCakePoolContract, useRevenueSharingVeCakeContract } from '../../../hooks/useContract'
+import { WEEK } from 'config/constants/veCake'
+import { useAccount } from 'wagmi'
+import {
+  useRevenueSharingCakePoolContract,
+  useRevenueSharingPoolGatewayContract,
+  useRevenueSharingVeCakeContract,
+} from '../../../hooks/useContract'
+import { poolStartWeekCursors } from '../config'
 import { useCurrentBlockTimestamp } from './useCurrentBlockTimestamp'
 
 interface RevenueSharingPool {
@@ -26,16 +31,15 @@ const initialData: RevenueSharingPool = {
 export const useRevenueSharingProxy = (
   contract: ReturnType<typeof useRevenueSharingCakePoolContract | typeof useRevenueSharingVeCakeContract>,
 ) => {
-  const { account, chainId } = useAccountActiveChain()
-  const blockTimestamp = useInitialBlockTimestamp()
+  const { address: account } = useAccount()
   const currentBlockTimestamp = useCurrentBlockTimestamp()
+  const gatewayContract = useRevenueSharingPoolGatewayContract()
 
   const { data } = useQuery({
     queryKey: ['/revenue-sharing-pool-for-cake', contract.address, contract.chain?.id, account],
     queryFn: async () => {
-      if (!account) return undefined
+      if (!account || !currentBlockTimestamp) return undefined
       try {
-        const now = Math.floor(blockTimestamp / ONE_WEEK_DEFAULT) * ONE_WEEK_DEFAULT
         const lastDistributionTimestamp = Math.floor(currentBlockTimestamp / ONE_WEEK_DEFAULT) * ONE_WEEK_DEFAULT
         const nextDistributionTimestamp = new BigNumber(lastDistributionTimestamp).plus(ONE_WEEK_DEFAULT).toNumber()
 
@@ -43,22 +47,23 @@ export const useRevenueSharingProxy = (
           {
             ...contract,
             functionName: 'balanceOfAt',
-            args: [account, now],
+            args: [account, lastDistributionTimestamp],
           },
           {
             ...contract,
             functionName: 'totalSupplyAt',
-            args: [now],
+            args: [lastDistributionTimestamp],
           },
         ]
 
-        const client = publicClient({ chainId })
+        const client = publicClient({ chainId: contract.chain?.id })
+        const poolLength = Math.ceil((currentBlockTimestamp - poolStartWeekCursors[contract.address]) / WEEK / 52)
         const [revenueResult, claimResult] = await Promise.all([
           client.multicall({
             contracts: revenueCalls,
             allowFailure: false,
           }),
-          contract.simulate.claim([account]),
+          gatewayContract.simulate.claimMultiple([Array(poolLength).fill(contract.address), account]),
         ])
 
         return {
@@ -73,7 +78,7 @@ export const useRevenueSharingProxy = (
         throw error
       }
     },
-    enabled: Boolean(blockTimestamp && account),
+    enabled: Boolean(account && currentBlockTimestamp),
   })
 
   return data ?? initialData
