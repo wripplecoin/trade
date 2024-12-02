@@ -87,6 +87,7 @@ export const QUOTING_API_PREFIX = `${X_API_ENDPOINT}/order-price`
 export const QUOTING_API = `${QUOTING_API_PREFIX}/get-price`
 
 export const FARMS_API = 'https://farms-api.pancakeswap.com'
+export const FARMS_API_V2 = 'https://v3-farm-api-prod-6ulht.ondigitalocean.app/api'
 
 export const MERCURYO_WIDGET_ID = process.env.NEXT_PUBLIC_MERCURYO_WIDGET_ID || '64d1f9f9-85ee-4558-8168-1dc0e7057ce6'
 

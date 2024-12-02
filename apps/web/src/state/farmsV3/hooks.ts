@@ -19,14 +19,13 @@ import { priceHelperTokens } from '@pancakeswap/farms/constants/common'
 import { bCakeFarmBoosterVeCakeABI } from '@pancakeswap/farms/constants/v3/abi/bCakeFarmBoosterVeCake'
 import { TvlMap, fetchCommonTokenUSDValue } from '@pancakeswap/farms/src/fetchFarmsV3'
 import { deserializeToken } from '@pancakeswap/token-lists'
+import { masterChefV3ABI } from '@pancakeswap/v3-sdk'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import BN from 'bignumber.js'
 import { FAST_INTERVAL } from 'config/constants'
-import { FARMS_API } from 'config/constants/endpoints'
+import { FARMS_API_V2 } from 'config/constants/endpoints'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import { useCakePrice } from 'hooks/useCakePrice'
-
-import { masterChefV3ABI } from '@pancakeswap/v3-sdk'
-import BN from 'bignumber.js'
 import {
   useBCakeFarmBoosterVeCakeContract,
   useMasterchefV3,
@@ -34,8 +33,10 @@ import {
   useV3NFTPositionManagerContract,
 } from 'hooks/useContract'
 import { useV3PositionsFromTokenIds, useV3TokenIdsByAccount } from 'hooks/v3/useV3Positions'
+import chunk from 'lodash/chunk'
 import toLower from 'lodash/toLower'
 import { useMemo } from 'react'
+import { safeGetAddress } from 'utils'
 import fetchWithTimeout from 'utils/fetchWithTimeout'
 import { getViemClients } from 'utils/viem'
 import { publicClient } from 'utils/wagmi'
@@ -96,8 +97,15 @@ export const useFarmsV3Public = () => {
           farms,
           commonPrice,
         })
-
-        return data
+        return {
+          ...data,
+          farmsWithPrice: data.farmsWithPrice
+            .map((farm) => {
+              const checksummedAddress = safeGetAddress(farm.lpAddress)
+              return checksummedAddress ? { ...farm, lpAddress: checksummedAddress } : undefined
+            })
+            .filter((farm): farm is FarmV3DataWithPrice => Boolean(farm)),
+        }
       } catch (error) {
         console.error(error)
         // return fallback for now since not all chains supported
@@ -134,9 +142,19 @@ export const useFarmsV3 = ({ mockApr = false, boosterLiquidityX = {} }: UseFarms
       const tvls: TvlMap = {}
       if (supportedChainIdV3.includes(chainId)) {
         const farmsToFetch = farmV3.data.farmsWithPrice.filter((f) => f.poolWeight !== '0')
+
+        // Chunk farm addresses into batches of 10
+        const addressChunks = chunk(
+          farmsToFetch.map((f) => f.lpAddress),
+          10,
+        )
+
         const results = await Promise.allSettled(
-          farmsToFetch.map((f) =>
-            fetchWithTimeout(`${FARMS_API}/v3/${chainId}/liquidity/${f.lpAddress}`, {
+          addressChunks.map((addressChunk, index) =>
+            fetchWithTimeout(`${FARMS_API_V2}/v3/${chainId}/liquidity?page=${index + 1}&size=10`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ farmAddresses: addressChunk }),
               signal,
             })
               .then((r) => r.json())
@@ -146,9 +164,16 @@ export const useFarmsV3 = ({ mockApr = false, boosterLiquidityX = {} }: UseFarms
               }),
           ),
         )
-        results.forEach((r, i) => {
-          tvls[farmsToFetch[i].lpAddress] =
-            r.status === 'fulfilled' ? { ...r.value.formatted, updatedAt: r.value.updatedAt } : null
+
+        results.forEach((r) => {
+          if (r.status === 'fulfilled') {
+            r.value.data.forEach((value) => {
+              const checksummedAddress = safeGetAddress(value.farmAddress)
+              if (checksummedAddress) {
+                tvls[checksummedAddress] = { ...value.formatted, updatedAt: new Date() }
+              }
+            })
+          }
         })
       }
 
@@ -189,8 +214,18 @@ export const useFarmsV3 = ({ mockApr = false, boosterLiquidityX = {} }: UseFarms
     },
 
     enabled: Boolean(farmV3.data.farmsWithPrice.length > 0),
+    placeholderData: (previousData, previousQuery) => {
+      const queryKey = previousQuery?.queryKey
+      if (!queryKey) return undefined
+
+      if (queryKey[0] === chainId) {
+        return previousData
+      }
+
+      return undefined
+    },
     refetchInterval: FAST_INTERVAL * 3,
-    staleTime: FAST_INTERVAL,
+    staleTime: FAST_INTERVAL * 3,
   })
 
   return {
@@ -262,7 +297,7 @@ export const useStakedPositionsByUser = (stakedTokenIds: bigint[], _chainId?: nu
     placeholderData: keepPreviousData,
   })
 
-  return { tokenIdResults: data || [], isLoading: harvestCalls.length > 0 && !data }
+  return { tokenIdResults: useMemo(() => data || [], [data]), isLoading: harvestCalls.length > 0 && !data }
 }
 
 const usePositionsByUserFarms = (
@@ -406,7 +441,7 @@ const useV3BoostedFarm = (pids?: number[]) => {
 
 const useV3BoostedLiquidityX = (): { data: Record<number, number> } => {
   const farmV3 = useFarmsV3Public()
-  const pids = farmV3.data?.farmsWithPrice?.map((f) => f.pid)
+  const pids = useMemo(() => farmV3?.data?.farmsWithPrice?.map((f) => f.pid), [farmV3?.data?.farmsWithPrice])
   const { chainId } = useActiveChainId()
   const masterChefV3Contract = useMasterchefV3()
 
@@ -421,20 +456,18 @@ const useV3BoostedLiquidityX = (): { data: Record<number, number> } => {
       }),
 
     enabled: Boolean(chainId && pids && pids.length > 0 && bCakeSupportedChainId.includes(chainId)),
-    retry: 3,
-    retryDelay: 3000,
   })
 
-  const result = useMemo(() => {
+  return useMemo(() => {
     const dataMap = data?.reduce((acc, d) => {
-      const updatedAcc = { ...acc }
-      updatedAcc[d.pid] = Number.isNaN(d.boosterliquidityX) ? 1 : d.boosterliquidityX
-      return updatedAcc
+      // eslint-disable-next-line no-param-reassign
+      acc[d.pid] = Number.isNaN(d.boosterliquidityX) ? 1 : d.boosterliquidityX
+      return acc
     }, {})
-    return dataMap
+    return {
+      data: dataMap ?? {},
+    }
   }, [data])
-
-  return { data: result ?? {} }
 }
 
 export async function getV3FarmBoosterWhiteList({
