@@ -16,7 +16,6 @@ import {
 } from '@pancakeswap/uikit'
 import { ASSET_CDN } from 'config/constants/endpoints'
 import { useActiveChainId, useLocalNetworkChain } from 'hooks/useActiveChainId'
-import { useNetworkConnectorUpdater } from 'hooks/useActiveWeb3React'
 import { useHover } from 'hooks/useHover'
 import { useSwitchNetwork } from 'hooks/useSwitchNetwork'
 import Image from 'next/image'
@@ -171,8 +170,6 @@ export const NetworkSwitcher = () => {
   const { chainId, isWrongNetwork, isNotMatched } = useActiveChainId()
   const { isLoading, canSwitch, switchNetworkAsync } = useSwitchNetwork()
   const router = useRouter()
-
-  useNetworkConnectorUpdater()
 
   const foundChain = useMemo(() => chains.find((c) => c.id === chainId), [chainId])
   const symbol =

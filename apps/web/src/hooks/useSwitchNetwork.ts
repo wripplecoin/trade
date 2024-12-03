@@ -9,6 +9,8 @@ import { clearUserStates } from 'utils/clearUserStates'
 import { useAccount, useSwitchChain } from 'wagmi'
 import { useAtom } from 'jotai/index'
 import { queryChainIdAtom } from 'hooks/useActiveChainId'
+import { EXCHANGE_PAGE_PATHS } from 'config/constants/exchange'
+import { getHashFromRouter } from 'utils/getHashFromRouter'
 import { useSwitchNetworkLoading } from './useSwitchNetworkLoading'
 
 export function useSwitchNetworkLocal() {
@@ -22,15 +24,25 @@ export function useSwitchNetworkLocal() {
 
   return useCallback(
     (newChainId: number) => {
-      const { chainId: _, ...restQuery } = router.query
-
+      const { chain: queryChainName, chainId: queryChainId, persistChain } = router.query
+      if (persistChain) return
+      const newChainQueryName = CHAIN_QUERY_NAME[newChainId]
+      const chainQueryName = queryChainName || CHAIN_QUERY_NAME[queryChainId as string]
+      const removeQueriesFromPath =
+        newChainQueryName !== chainQueryName &&
+        EXCHANGE_PAGE_PATHS.some((item) => {
+          return router.pathname === '/' || router.pathname.startsWith(item)
+        })
+      const uriHash = getHashFromRouter(router)?.[0]
+      const { chainId: _chainId, ...omittedQuery } = router.query
       router.replace(
         {
           pathname: router.pathname,
           query: {
-            ...restQuery,
-            chain: CHAIN_QUERY_NAME[newChainId],
+            ...(!removeQueriesFromPath && omittedQuery),
+            chain: newChainQueryName,
           },
+          ...(uriHash && { hash: uriHash }),
         },
         undefined,
         {
