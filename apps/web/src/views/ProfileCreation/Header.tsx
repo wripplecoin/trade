@@ -1,5 +1,5 @@
 import { TranslateFunction, useTranslation } from '@pancakeswap/localization'
-import { Breadcrumbs, Button, Heading, Link, Text } from '@pancakeswap/uikit'
+import { Breadcrumbs, Button, Heading, Text } from '@pancakeswap/uikit'
 import { styled } from 'styled-components'
 import { NextLinkFromReactRouter } from '@pancakeswap/widgets-internal'
 import useProfileCreation from './contexts/hook'

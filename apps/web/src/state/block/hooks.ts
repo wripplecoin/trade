@@ -98,12 +98,15 @@ export const useInitialBlockTimestamp = (chainId?: number): number => {
       refetchOnReconnect: false,
       refetchOnMount: false,
       enabled: !initialBlockTimestamp && isTargetDifferent,
-      select: useCallback((block) => {
-        queryClient.setQueryData(
-          getInitialBlockTimestampQueryKey(chainId),
-          block !== undefined ? Number(block.timestamp) : undefined,
-        )
-      }, []),
+      select: useCallback(
+        (block) => {
+          queryClient.setQueryData(
+            getInitialBlockTimestampQueryKey(chainId),
+            block !== undefined ? Number(block.timestamp) : undefined,
+          )
+        },
+        [chainId, queryClient],
+      ),
     },
   })
   return initialBlockTimestamp

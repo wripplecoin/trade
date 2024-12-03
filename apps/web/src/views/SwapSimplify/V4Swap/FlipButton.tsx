@@ -11,7 +11,6 @@ import { useSwapActionHandlers } from 'state/swap/useSwapActionHandlers'
 import { styled } from 'styled-components'
 
 import { SwapUIV2 } from '@pancakeswap/widgets-internal'
-import { useRouter } from 'next/router'
 import { useAllowRecipient } from '../../Swap/V3Swap/hooks'
 
 export const Line = styled.div`

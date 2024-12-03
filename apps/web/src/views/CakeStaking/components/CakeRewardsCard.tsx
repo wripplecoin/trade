@@ -38,7 +38,6 @@ import BenefitsTooltipsText from 'views/Pools/components/RevenueSharing/Benefits
 import { timeFormat } from 'views/TradingReward/utils/timeFormat'
 import { poolStartWeekCursors } from 'views/CakeStaking/config'
 import { WEEK } from 'config/constants/veCake'
-import { useInitialBlockTimestamp } from 'state/block/hooks'
 import {
   useCakePoolEmission,
   useRevShareEmission,

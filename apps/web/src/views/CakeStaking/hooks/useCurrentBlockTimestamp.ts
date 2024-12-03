@@ -1,5 +1,3 @@
-import dayjs from 'dayjs'
-
 import { useCurrentBlockTimestamp as useBlockTimestamp } from 'state/block/hooks'
 import { verifyBscNetwork } from 'utils/verifyBscNetwork'
 import { useActiveChainId } from 'hooks/useActiveChainId'
