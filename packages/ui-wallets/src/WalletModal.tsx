@@ -163,7 +163,7 @@ function MobileModal<T>({
           onClick={(wallet) => {
             connectWallet(wallet)
             if (wallet.deepLink && wallet.installed === false) {
-              window.open(wallet.deepLink)
+              window.open(wallet.deepLink, '_blank', 'noopener noreferrer')
             }
           }}
         />

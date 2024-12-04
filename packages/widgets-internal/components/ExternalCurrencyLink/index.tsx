@@ -55,7 +55,7 @@ type Props = {
 
 export function ExternalCurrencyLink({ currencyLogo, title, desc, href, ...props }: Props) {
   const onLinkClick = useCallback(() => {
-    window.open(href, "_blank");
+    window.open(href, "_blank", "noopener noreferrer");
   }, [href]);
 
   return (
