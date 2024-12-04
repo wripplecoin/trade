@@ -190,6 +190,12 @@ const config: (
       ],
       items: [
         {
+          status: { text: t('New'), color: 'success' },
+          label: t('Springboard'),
+          href: 'https://springboard.pancakeswap.finance',
+          type: DropdownMenuItemType.EXTERNAL_LINK,
+        },
+        {
           label: t('Prediction (BETA)'),
           href: '/prediction',
           image: '/images/decorations/prediction.png',
