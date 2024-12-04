@@ -1,5 +1,12 @@
 # @pancakeswap/routing-sdk-addon-v2
 
+## 2.0.2
+
+### Patch Changes
+
+- @pancakeswap/routing-sdk-addon-stable-swap@2.0.5
+- @pancakeswap/routing-sdk-addon-v3@2.0.3
+
 ## 2.0.1
 
 ### Patch Changes

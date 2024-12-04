@@ -1,5 +1,11 @@
 # @pancakeswap/pcsx-sdk
 
+## 1.0.2
+
+### Patch Changes
+
+- @pancakeswap/permit2-sdk@1.0.12
+
 ## 1.0.1
 
 ### Patch Changes

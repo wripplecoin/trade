@@ -1,5 +1,13 @@
 # @pancakeswap/gauges
 
+## 2.0.3
+
+### Patch Changes
+
+- b529b61: Update mainnet gauges contract address
+  - @pancakeswap/tokens@0.6.29
+  - @pancakeswap/v3-sdk@3.8.13
+
 ## 2.0.2
 
 ### Patch Changes
