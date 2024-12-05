@@ -1,13 +1,12 @@
 import { useTranslation } from '@pancakeswap/localization'
 import { Box, QuestionHelperV2, SkeletonV2, Text } from '@pancakeswap/uikit'
 import { RowBetween, RowFixed } from 'components/Layout/Row'
-import { useIsConnectedMetaMask, useIsMEVEnabled } from './hooks'
+import { useIsMEVEnabled } from './hooks'
 
 export const MevSwapDetail: React.FC = () => {
   const { t } = useTranslation()
-  const isConnected = useIsConnectedMetaMask()
   const { isMEVEnabled, isLoading } = useIsMEVEnabled()
-  if (!isConnected && !isMEVEnabled) {
+  if (!isMEVEnabled) {
     return null
   }
   return (

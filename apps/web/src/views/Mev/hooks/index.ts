@@ -1,59 +1,104 @@
 import { ChainId } from '@pancakeswap/chains'
 import { useQuery } from '@tanstack/react-query'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
+import { WalletClient } from 'viem'
 import { bsc } from 'viem/chains'
 
-async function fetchMEVStatus(): Promise<boolean> {
-  if (!window.ethereum || (!window.ethereum as any)?.request) {
-    throw new Error('Ethereum provider not found')
-  }
+import { useWalletClient } from 'wagmi'
 
+async function checkWalletSupportAddEthereumChain(walletClient: WalletClient) {
   try {
-    const result = await (window.ethereum as any)?.request({
-      method: 'eth_call',
+    await walletClient.request({
+      method: 'wallet_addEthereumChain',
+      // @ts-ignore
       params: [
+        // mock data without key params nativeCurrency
         {
-          to: '0x0000000000000000000000000000000000000048',
-          value: '0x30',
+          chainId: '0x38', // Chain ID in hexadecimal (56 for Binance Smart Chain)
+          chainName: 'PancakeSwap MEV Guard',
+          rpcUrls: ['https://bscrpc.pancakeswap.finance'], // PancakeSwap MEV RPC}
         },
       ],
     })
-    return result === '0x30'
+
+    console.error('lack of parameter, should be error')
+    return false
   } catch (error) {
-    console.error('Error checking MEV status:', error)
+    if ((error as any)?.code === -32602) {
+      console.info("the mock test passed, there's some parameter issue as expected", error)
+      return true
+    }
+    if ((error as any)?.code === -32601) {
+      console.error('wallet_addEthereumChain is not supported')
+      return false
+    }
+
+    console.error(error, 'wallet_addEthereumChain is not supported')
     return false
   }
 }
 
-export function useIsMEVEnabled() {
-  const isMetaMask = useIsConnectedMetaMask()
+async function fetchMEVStatus(walletClient: WalletClient): Promise<{ mevEnabled: boolean }> {
+  if (!walletClient || !walletClient.request) {
+    console.error('Ethereum provider not found')
+    return { mevEnabled: false }
+  }
 
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ['isMEVEnabled'],
-    queryFn: fetchMEVStatus,
-    enabled: isMetaMask,
-    staleTime: 60000,
-    retry: false,
-  })
-
-  return { isMEVEnabled: data ?? false, isLoading, refetch }
+  try {
+    const result = await walletClient.request({
+      // @ts-ignore
+      method: 'eth_call',
+      params: [
+        {
+          from: walletClient.account?.address ?? '0x',
+          to: '0x0000000000000000000000000000000000000048',
+          value: '0x30',
+          data: '0x',
+        },
+      ],
+    })
+    return { mevEnabled: result === '0x30' }
+  } catch (error) {
+    console.error('Error checking MEV status:', error)
+    return { mevEnabled: false }
+  }
 }
 
-export const useIsConnectedMetaMask = () => {
+export function useWalletSupportsAddEthereumChain() {
+  const { data: walletClient } = useWalletClient()
+  const { data, isLoading } = useQuery({
+    queryKey: ['walletSupportsAddEthereumChain', walletClient],
+    queryFn: () => checkWalletSupportAddEthereumChain(walletClient!),
+    enabled: Boolean(walletClient),
+    retry: false,
+  })
+  return { walletSupportsAddEthereumChain: data ?? false, isLoading }
+}
+
+export function useIsMEVEnabled() {
+  const { data: walletClient } = useWalletClient()
   const { account, chainId } = useActiveWeb3React()
-  return useMemo(() => {
-    return Boolean(account) && Boolean(window.ethereum?.isMetaMask) && chainId === ChainId.BSC
-  }, [account, chainId])
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['isMEVEnabled', walletClient, account, chainId],
+    queryFn: () => fetchMEVStatus(walletClient!),
+    enabled: Boolean(account) && walletClient && chainId === ChainId.BSC,
+    staleTime: 60000,
+  })
+
+  return { isMEVEnabled: data?.mevEnabled ?? false, isLoading, refetch }
 }
 
 export const useShouldShowMEVToggle = () => {
-  const isMetaMask = useIsConnectedMetaMask()
+  const { walletSupportsAddEthereumChain, isLoading: isWalletSupportLoading } = useWalletSupportsAddEthereumChain()
+  const { account } = useActiveWeb3React()
   const { isMEVEnabled, isLoading } = useIsMEVEnabled()
-  return !isMEVEnabled && !isLoading && isMetaMask
+  return !isMEVEnabled && !isLoading && !isWalletSupportLoading && Boolean(account) && walletSupportsAddEthereumChain
 }
 
 export const useAddMevRpc = (onSuccess?: () => void, onBeforeStart?: () => void, onFinish?: () => void) => {
+  const { data: walletClient } = useWalletClient()
   const addMevRpc = useCallback(async () => {
     onBeforeStart?.()
     try {
@@ -66,10 +111,10 @@ export const useAddMevRpc = (onSuccess?: () => void, onBeforeStart?: () => void,
       }
 
       // Check if the Ethereum provider is available
-      if (window.ethereum) {
+      if (walletClient) {
         try {
           // Prompt the wallet to add the custom network
-          await (window.ethereum as any)?.request({
+          await walletClient.request({
             method: 'wallet_addEthereumChain',
             params: [networkParams],
           })
@@ -82,10 +127,11 @@ export const useAddMevRpc = (onSuccess?: () => void, onBeforeStart?: () => void,
         console.warn('Ethereum provider not found. Please check your wallet')
       }
     } catch (error) {
-      console.error(error)
+      if ((error as any).code === -32601) console.error('wallet_addEthereumChain is not supported')
+      else console.error(error)
     } finally {
       onFinish?.()
     }
-  }, [onBeforeStart, onSuccess, onFinish])
+  }, [onBeforeStart, onSuccess, onFinish, walletClient])
   return { addMevRpc }
 }
