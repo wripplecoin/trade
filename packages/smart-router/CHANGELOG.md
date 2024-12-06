@@ -1,5 +1,11 @@
 # @pancakeswap/smart-router
 
+## 7.0.1
+
+### Patch Changes
+
+- 4181a79: Fix unable to fetch quote with wrapped native token as output
+
 ## 7.0.0
 
 ### Major Changes
