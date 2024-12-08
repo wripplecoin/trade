@@ -1,5 +1,5 @@
 import { watchAccount } from '@wagmi/core'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useAppDispatch } from 'state'
 import { clearUserStates } from 'utils/clearUserStates'
 import { useAccount, useAccountEffect, useConfig } from 'wagmi'
@@ -22,7 +22,7 @@ export const useChainIdListener = () => {
     return () => {
       connector?.emitter?.off('change', onChainChanged)
     }
-  })
+  }, [connector, onChainChanged])
 }
 
 const useAddressListener = () => {
@@ -47,9 +47,14 @@ export const useAccountEventListener = () => {
   useChainIdListener()
   useAddressListener()
 
-  useAccountEffect({
-    onDisconnect() {
-      clearUserStates(dispatch, { chainId })
-    },
-  })
+  useAccountEffect(
+    useMemo(
+      () => ({
+        onDisconnect() {
+          clearUserStates(dispatch, { chainId })
+        },
+      }),
+      [chainId, dispatch],
+    ),
+  )
 }

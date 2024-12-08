@@ -2,22 +2,26 @@ import { ChainId } from '@pancakeswap/chains'
 import { useQuery } from '@tanstack/react-query'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useCallback } from 'react'
-import { WalletClient } from 'viem'
-import { bsc } from 'viem/chains'
+import { InternalRpcError, InvalidParamsRpcError, MethodNotFoundRpcError, WalletClient } from 'viem'
+import { addChain } from 'viem/actions'
 
 import { useWalletClient } from 'wagmi'
+import { bsc } from 'viem/chains'
+import { BSCMevGuardChain } from 'utils/mevGuardChains'
 
 async function checkWalletSupportAddEthereumChain(walletClient: WalletClient) {
   try {
+    if (window?.ethereum?.isSafePal) return false
     await walletClient.request({
       method: 'wallet_addEthereumChain',
-      // @ts-ignore
       params: [
-        // mock data without key params nativeCurrency
+        // mock data without key params chainId
+        // @ts-ignore
         {
-          chainId: '0x38', // Chain ID in hexadecimal (56 for Binance Smart Chain)
           chainName: 'PancakeSwap MEV Guard',
           rpcUrls: ['https://bscrpc.pancakeswap.finance'], // PancakeSwap MEV RPC}
+          nativeCurrency: bsc.nativeCurrency,
+          blockExplorerUrls: [bsc.blockExplorers.default.url],
         },
       ],
     })
@@ -25,11 +29,14 @@ async function checkWalletSupportAddEthereumChain(walletClient: WalletClient) {
     console.error('lack of parameter, should be error')
     return false
   } catch (error) {
-    if ((error as any)?.code === -32602) {
+    if (
+      [InvalidParamsRpcError.code, InternalRpcError.code].includes((error as any)?.code) &&
+      (error as any)?.message?.includes('chainId')
+    ) {
       console.info("the mock test passed, there's some parameter issue as expected", error)
       return true
     }
-    if ((error as any)?.code === -32601) {
+    if ((error as any)?.code === MethodNotFoundRpcError.code) {
       console.error('wallet_addEthereumChain is not supported')
       return false
     }
@@ -56,6 +63,7 @@ async function fetchMEVStatus(walletClient: WalletClient): Promise<{ mevEnabled:
           value: '0x30',
           data: '0x',
         },
+        'latest',
       ],
     })
     return { mevEnabled: result === '0x30' }
@@ -102,33 +110,18 @@ export const useAddMevRpc = (onSuccess?: () => void, onBeforeStart?: () => void,
   const addMevRpc = useCallback(async () => {
     onBeforeStart?.()
     try {
-      const networkParams = {
-        chainId: '0x38', // Chain ID in hexadecimal (56 for Binance Smart Chain)
-        chainName: 'PancakeSwap MEV Guard',
-        rpcUrls: ['https://bscrpc.pancakeswap.finance'], // PancakeSwap MEV RPC
-        nativeCurrency: bsc.nativeCurrency,
-        blockExplorerUrls: [bsc.blockExplorers.default.url],
-      }
-
       // Check if the Ethereum provider is available
       if (walletClient) {
-        try {
-          // Prompt the wallet to add the custom network
-          await walletClient.request({
-            method: 'wallet_addEthereumChain',
-            params: [networkParams],
-          })
-          console.info('RPC network added successfully!')
-          onSuccess?.()
-        } catch (error) {
-          console.error('Error adding RPC network:', error)
-        }
+        // Prompt the wallet to add the custom network
+        await addChain(walletClient, { chain: BSCMevGuardChain })
+        console.info('RPC network added successfully!')
+        onSuccess?.()
       } else {
         console.warn('Ethereum provider not found. Please check your wallet')
       }
     } catch (error) {
-      if ((error as any).code === -32601) console.error('wallet_addEthereumChain is not supported')
-      else console.error(error)
+      if ((error as any).code === MethodNotFoundRpcError.code) console.error('wallet_addEthereumChain is not supported')
+      else console.error('Error adding RPC network:', error)
     } finally {
       onFinish?.()
     }
