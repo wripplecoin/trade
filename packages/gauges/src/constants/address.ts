@@ -9,6 +9,6 @@ export const GAUGES_ADDRESS = {
 }
 
 export const GAUGES_CALC_ADDRESS = {
-  [ChainId.BSC]: '0x6180ae98a8eBD3A51AcdA04fE1Bd0fE552410443' as const,
+  [ChainId.BSC]: '0x94F8cBa8712B3E72C9BF8Ba4d6619Ac9046FE695' as const,
   [ChainId.BSC_TESTNET]: '0x88B02E6238fa6279281eeA600CBfcAd5dd3597A5' as const,
 }
