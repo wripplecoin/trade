@@ -5,6 +5,7 @@ import GlobalCheckClaimStatus from 'components/GlobalCheckClaimStatus'
 import { PageMeta } from 'components/Layout/Page'
 import { AffiliateExpiredModal } from 'components/Modal/AffiliateExpiredModal'
 import { AffiliateSunsetModal } from 'components/Modal/AffiliateSunsetModal'
+import { SimpleStakingSunsetModal } from 'components/Modal/SimpleStakingSunsetModal'
 import { NetworkModal } from 'components/NetworkModal'
 import { FixedSubgraphHealthIndicator } from 'components/SubgraphHealthIndicator/FixedSubgraphHealthIndicator'
 import TransactionsDetailModal from 'components/TransactionDetailModal'
@@ -198,6 +199,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
       <ZKSyncAirdropModalWithAutoPopup />
       <AffiliateExpiredModal />
       <AffiliateSunsetModal />
+      <SimpleStakingSunsetModal />
       <VercelToolbar />
     </ProductionErrorBoundary>
   )

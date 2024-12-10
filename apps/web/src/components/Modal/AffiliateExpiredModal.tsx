@@ -1,24 +1,12 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { useModal, Text, LinkExternal } from '@pancakeswap/uikit'
-import { ReactNode, useCallback, useEffect } from 'react'
+import { LinkExternal, Text, useModal } from '@pancakeswap/uikit'
+import { useCallback, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 
+import { Trans } from 'components/CustomTrans'
 import DisclaimerModal from 'components/DisclaimerModal'
 import { useAffiliateExpired } from 'hooks/useAffiliateExpired'
 import { useUserAcknowledgement } from 'hooks/useUserAcknowledgement'
-
-const transRegex = /(%[^%]+%)/
-
-function Trans({ text, data = {} }: { text: string; data?: { [key: string]: ReactNode } }) {
-  const parts = text.split(transRegex)
-  return parts.map((p) => {
-    if (!transRegex.test(p)) {
-      return p
-    }
-    const key = p.replace(/%/g, '')
-    return data[key] || p
-  })
-}
 
 export function AffiliateExpiredModal() {
   const { t } = useTranslation()
