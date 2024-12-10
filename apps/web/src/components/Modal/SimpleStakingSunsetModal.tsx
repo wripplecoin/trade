@@ -62,8 +62,12 @@ export function SimpleStakingSunsetModal() {
           <Text mt="0.5rem">2️⃣ {t('Connect your wallet')}</Text>
           <Text mt="0.5rem">3️⃣ {t('Select your stake and withdraw')}</Text>
           <Text mt="1.5rem">
-            {/* TODO: update the link after MKT team prepare for it */}
-            <LinkExternal bold style={{ display: 'inline-flex' }} showExternalIcon href="/simple-staking">
+            <LinkExternal
+              bold
+              style={{ display: 'inline-flex' }}
+              showExternalIcon
+              href="https://blog.pancakeswap.finance/articles/action-required-simple-staking-product-retirement"
+            >
               {t('Learn more here')}
             </LinkExternal>
           </Text>
