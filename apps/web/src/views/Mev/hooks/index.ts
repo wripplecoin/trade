@@ -2,52 +2,69 @@ import { ChainId } from '@pancakeswap/chains'
 import { useQuery } from '@tanstack/react-query'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useCallback } from 'react'
-import { InternalRpcError, InvalidParamsRpcError, MethodNotFoundRpcError, WalletClient } from 'viem'
-import { addChain } from 'viem/actions'
+import { MethodNotFoundRpcError, WalletClient } from 'viem'
 
-import { useWalletClient } from 'wagmi'
-import { bsc } from 'viem/chains'
 import { BSCMevGuardChain } from 'utils/mevGuardChains'
+import { addChain } from 'viem/actions'
+import { Connector, useAccount, useWalletClient } from 'wagmi'
 
-async function checkWalletSupportAddEthereumChain(walletClient: WalletClient) {
+const WalletProviders = [
+  'isApexWallet',
+  'isAvalanche',
+  'isBackpack',
+  'isBifrost',
+  'isBitKeep',
+  'isBitski',
+  'isBlockWallet',
+  'isBraveWallet',
+  'isCoinbaseWallet',
+  'isDawn',
+  'isEnkrypt',
+  'isExodus',
+  'isFrame',
+  'isFrontier',
+  'isGamestop',
+  'isHyperPay',
+  'isImToken',
+  'isKuCoinWallet',
+  'isMathWallet',
+  // 'isMetaMask',
+  'isOkxWallet',
+  'isOKExWallet',
+  'isOneInchAndroidWallet',
+  'isOneInchIOSWallet',
+  'isOneKey',
+  'isOpera',
+  'isPhantom',
+  'isPortal',
+  'isRabby',
+  'isRainbow',
+  'isStatus',
+  'isTally',
+  'isTokenPocket',
+  'isTokenary',
+  'isTrust',
+  'isTrustWallet',
+  'isUniswapWallet',
+  'isXDEFI',
+  'isZerion',
+]
+
+async function checkWalletSupportAddEthereumChain(connector: Connector) {
   try {
-    if (window?.ethereum?.isSafePal) return false
-    await walletClient.request({
-      method: 'wallet_addEthereumChain',
-      params: [
-        // mock data without key params chainId
-        // @ts-ignore
-        {
-          chainName: 'PancakeSwap MEV Guard',
-          rpcUrls: ['https://bscrpc.pancakeswap.finance'], // PancakeSwap MEV RPC}
-          nativeCurrency: bsc.nativeCurrency,
-          blockExplorerUrls: [bsc.blockExplorers.default.url],
-        },
-      ],
-    })
+    if (typeof connector.getProvider !== 'function') return false
 
-    console.error('lack of parameter, should be error')
-    return false
+    const provider = (await connector.getProvider()) as any
+
+    return provider && provider.isMetaMask && !WalletProviders.some((p: string) => p in provider)
   } catch (error) {
-    if (
-      [InvalidParamsRpcError.code, InternalRpcError.code].includes((error as any)?.code) &&
-      (error as any)?.message?.includes('chainId')
-    ) {
-      console.info("the mock test passed, there's some parameter issue as expected", error)
-      return true
-    }
-    if ((error as any)?.code === MethodNotFoundRpcError.code) {
-      console.error('wallet_addEthereumChain is not supported')
-      return false
-    }
-
     console.error(error, 'wallet_addEthereumChain is not supported')
     return false
   }
 }
 
 async function fetchMEVStatus(walletClient: WalletClient): Promise<{ mevEnabled: boolean }> {
-  if (!walletClient || !walletClient.request) {
+  if (!walletClient || !walletClient?.request) {
     console.error('Ethereum provider not found')
     return { mevEnabled: false }
   }
@@ -74,11 +91,11 @@ async function fetchMEVStatus(walletClient: WalletClient): Promise<{ mevEnabled:
 }
 
 export function useWalletSupportsAddEthereumChain() {
-  const { data: walletClient } = useWalletClient()
+  const { connector } = useAccount()
   const { data, isLoading } = useQuery({
-    queryKey: ['walletSupportsAddEthereumChain', walletClient],
-    queryFn: () => checkWalletSupportAddEthereumChain(walletClient!),
-    enabled: Boolean(walletClient),
+    queryKey: ['walletSupportsAddEthereumChain', connector?.uid],
+    queryFn: () => checkWalletSupportAddEthereumChain(connector!),
+    enabled: Boolean(connector),
     retry: false,
   })
   return { walletSupportsAddEthereumChain: data ?? false, isLoading }
@@ -113,8 +130,8 @@ export const useAddMevRpc = (onSuccess?: () => void, onBeforeStart?: () => void,
       // Check if the Ethereum provider is available
       if (walletClient) {
         // Prompt the wallet to add the custom network
-        await addChain(walletClient, { chain: BSCMevGuardChain })
-        console.info('RPC network added successfully!')
+        const result = await addChain(walletClient, { chain: BSCMevGuardChain })
+        console.info('RPC network added successfully!', result)
         onSuccess?.()
       } else {
         console.warn('Ethereum provider not found. Please check your wallet')
