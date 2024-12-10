@@ -46,7 +46,7 @@ const AprModal: React.FC<Omit<V2PoolAprModalProps, 'modal'>> = ({ poolInfo, comb
     poolInfo,
   )
 
-  const pairs = useStableSwapPairsByChainId(poolInfo.chainId)
+  const pairs = useStableSwapPairsByChainId(poolInfo?.chainId, poolInfo?.protocol === 'stable')
 
   const stakingTokenBalance = useMemo(() => {
     return BIG_ZERO.plus(userPosition?.farmingBalance?.quotient.toString() ?? 0).plus(

@@ -3,7 +3,7 @@ import { LegacyRouter } from '@pancakeswap/smart-router/legacy-router'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
-export const useStableSwapPairsByChainId = (chainId: ChainId) => {
+export const useStableSwapPairsByChainId = (chainId: ChainId, enabled = true) => {
   const { data } = useQuery({
     queryKey: ['fetch-stable-swap-pairs', chainId],
     queryFn: async () => {
@@ -13,7 +13,7 @@ export const useStableSwapPairsByChainId = (chainId: ChainId) => {
       }
       return []
     },
-    enabled: Boolean(chainId),
+    enabled: Boolean(chainId && enabled),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     refetchOnMount: false,

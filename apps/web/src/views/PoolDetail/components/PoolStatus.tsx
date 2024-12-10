@@ -18,7 +18,7 @@ type PoolStatusProps = {
 }
 export const PoolStatus: React.FC<PoolStatusProps> = ({ poolInfo }) => {
   const { t } = useTranslation()
-  const pairs = useStableSwapPairsByChainId(poolInfo?.chainId ?? ChainId.BSC)
+  const pairs = useStableSwapPairsByChainId(poolInfo?.chainId ?? ChainId.BSC, poolInfo?.protocol === 'stable')
 
   const tvlChange = useMemo(() => {
     if (!poolInfo) return null
