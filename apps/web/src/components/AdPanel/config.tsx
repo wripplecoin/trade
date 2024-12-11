@@ -63,7 +63,7 @@ export const useAdConfig = () => {
 
 // Array of strings or regex patterns
 const commonLayoutAdIgnoredPages = [
-  '/home',
+  '/mev',
   '/cake-staking',
   // Route matching: /liquidity/pool/<chainName>/<poolAddress>
   /\/liquidity\/pool\/\w+\/\w+/,

@@ -17,7 +17,7 @@ interface PathList {
 const getPathList = memoize((t: ContextApi['t']): PathList => {
   return {
     paths: {
-      '/home': { title: t('Home') },
+      '/mev': { title: t('Home') },
       '/': { basePath: true, title: t('Exchange'), image: `${ASSET_CDN}/web/og/swap.jpg` },
       '/swap': { basePath: true, title: t('Exchange'), image: `${ASSET_CDN}/web/og/swap.jpg` },
       '/limit-orders': { basePath: true, title: t('Limit Orders'), image: `${ASSET_CDN}/web/og/limit.jpg` },

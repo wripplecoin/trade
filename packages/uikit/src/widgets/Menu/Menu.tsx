@@ -150,7 +150,7 @@ const Menu: React.FC<React.PropsWithChildren<NavProps>> = ({
             {banner && isMounted && <TopBannerContainer height={topBannerHeight}>{banner}</TopBannerContainer>}
             <StyledNav>
               <Flex>
-                {logoComponent ?? <Logo href={homeLink?.href ?? "/home"} />}
+                {logoComponent ?? <Logo href={homeLink?.href ?? "/mev"} />}
                 <AtomBox display={{ xs: "none", lg: "block" }}>
                   <MenuItems
                     ml="24px"
