@@ -1,5 +1,5 @@
 export enum SwapType {
   MARKET,
-  TWAP,
-  LIMIT,
+  CLAIMAIRDROP,
+  // LIMIT,
 }

@@ -12,12 +12,12 @@ export const SwapSelection = ({ swapType }: { swapType: SwapType }) => {
     (value: SwapType) => {
       let url = ''
       switch (value) {
-        case SwapType.LIMIT:
-          url = '/swap/limit'
-          break
-        case SwapType.TWAP:
-          url = '/swap/twap'
-          break
+        // case SwapType.LIMIT:
+        //   url = '/swap/limit'
+        //   break
+        // case SwapType.TWAP:
+        //   url = '/swap/twap'
+        //   break
         case SwapType.MARKET:
           url = '/swap'
           break
@@ -41,8 +41,8 @@ export const SwapSelection = ({ swapType }: { swapType: SwapType }) => {
       variant="subtle"
     >
       <ButtonMenuItem>MARKET</ButtonMenuItem>
-      <ButtonMenuItem>TWAP</ButtonMenuItem>
-      <ButtonMenuItem>LIMIT</ButtonMenuItem>
+      <ButtonMenuItem>Claim Airdrop</ButtonMenuItem>
+      {/* <ButtonMenuItem>LIMIT</ButtonMenuItem> */}
     </ButtonMenu>
   )
 }
