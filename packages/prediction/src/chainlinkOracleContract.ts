@@ -10,7 +10,7 @@ export const chainlinkOracleBNB: Record<string, Address> = {
 } as const satisfies ContractAddresses<SupportedChainId>
 
 export const chainlinkOracleCAKE: Record<string, Address> = {
-  [ChainId.BSC]: '0xB6064eD41d4f67e353768aA239cA86f4F73665a1',
+  [ChainId.BSC]: '0x93A67D414896A280bF8FFB3b389fE3686E014fda',
   [ChainId.ZKSYNC]: '0x',
   [ChainId.ARBITRUM_ONE]: '0x',
 } as const satisfies ContractAddresses<SupportedChainId>

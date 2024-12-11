@@ -4,7 +4,6 @@ import { BIG_ZERO } from '@pancakeswap/utils/bigNumber'
 import { useQuery } from '@tanstack/react-query'
 import BigNumber from 'bignumber.js'
 import { chainlinkOracleABI } from 'config/abi/chainlinkOracle'
-import { FAST_INTERVAL } from 'config/constants'
 import { publicClient } from 'utils/wagmi'
 import { formatUnits } from 'viem'
 
@@ -13,8 +12,8 @@ export const useCakePrice = ({ enabled = true } = {}) => {
   const { data } = useQuery<BigNumber, Error>({
     queryKey: ['cakePrice'],
     queryFn: async () => new BigNumber(await getCakePriceFromOracle()),
-    staleTime: FAST_INTERVAL,
-    refetchInterval: FAST_INTERVAL,
+    // staleTime: FAST_INTERVAL,
+    // refetchInterval: FAST_INTERVAL,
     enabled,
   })
   return data ?? BIG_ZERO

@@ -1,13 +1,13 @@
-import { useMemo } from 'react'
-import { Trade, TradeType, CurrencyAmount, Currency } from '@pancakeswap/aptos-swap-sdk'
-import { Button, Text, ErrorIcon, ArrowDownIcon, RowBetween, RowFixed, AutoColumn } from '@pancakeswap/uikit'
-import { Field } from 'state/swap'
+import { Currency, CurrencyAmount, Trade, TradeType } from '@pancakeswap/aptos-swap-sdk'
 import { useTranslation } from '@pancakeswap/localization'
-import { computeTradePriceBreakdown, warningSeverity } from 'utils/exchange'
-import { CurrencyLogo } from 'components/Logo'
+import { ArrowDownIcon, AutoColumn, Button, ErrorIcon, RowBetween, RowFixed, Text } from '@pancakeswap/uikit'
 import truncateHash from '@pancakeswap/utils/truncateHash'
+import { CurrencyLogo } from 'components/Logo'
+import { useMemo } from 'react'
+import { Field } from 'state/swap'
+import { computeTradePriceBreakdown, warningSeverity } from 'utils/exchange'
 import formatAmountDisplay from 'utils/formatAmountDisplay'
-import { TruncatedText, SwapShowAcceptChanges } from './styleds'
+import { SwapShowAcceptChanges, TruncatedText } from './styleds'
 
 export default function SwapModalHeader({
   trade,

@@ -60,7 +60,7 @@ const SlippageTabs = () => {
   let slippageError: SlippageError | undefined
   if (slippageInput !== '' && !slippageInputIsValid) {
     slippageError = SlippageError.InvalidInput
-  } else if (slippageInputIsValid && userSlippageTolerance < 50) {
+  } else if (slippageInputIsValid && userSlippageTolerance < 700) {
     // Slippage < 0.5%
     slippageError = SlippageError.RiskyLow
   } else if (slippageInputIsValid && userSlippageTolerance > 2000) {
@@ -100,8 +100,8 @@ const SlippageTabs = () => {
 
   const parseCustomDeadline = (value: string) => {
     try {
-      const valueAsInt: number = Number.parseInt(value) * 60
-      if (!Number.isNaN(valueAsInt) && valueAsInt > 60 && valueAsInt < THREE_DAYS_IN_SECONDS) {
+      const valueAsInt: number = Number.parseInt(value) * 600
+      if (!Number.isNaN(valueAsInt) && valueAsInt > 600 && valueAsInt < THREE_DAYS_IN_SECONDS) {
         setTTL(valueAsInt)
       } else {
         setDeadlineError(DeadlineError.InvalidInput)
@@ -139,11 +139,11 @@ const SlippageTabs = () => {
             scale="sm"
             onClick={() => {
               setSlippageInput('')
-              setUserSlippageTolerance(50)
+              setUserSlippageTolerance(600)
             }}
-            variant={userSlippageTolerance === 50 ? 'subtle' : 'light'}
+            variant={userSlippageTolerance === 600 ? 'subtle' : 'light'}
           >
-            0.5%
+            6%
           </StyledButton>
           <StyledButton
             scale="sm"

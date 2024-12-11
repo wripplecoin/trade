@@ -26,7 +26,7 @@ export const SlippageButton = ({ slippage }: SlippageButtonProps) => {
   const { isMobile } = useMatchBreakpoints()
 
   const isRiskyLow = typeof slippage === 'number' && slippage < 50
-  const isRiskyHigh = typeof slippage === 'number' && slippage > 100
+  const isRiskyHigh = typeof slippage === 'number' && slippage > 700
   const isRiskyVeryHigh = typeof slippage === 'number' && slippage > 2000
 
   const { targetRef, tooltip, tooltipVisible } = useTooltip(
@@ -65,7 +65,7 @@ export const SlippageButton = ({ slippage }: SlippageButtonProps) => {
                 endIcon={<PencilIcon color={color} width={12} />}
                 onClick={onClick}
               >
-                {typeof slippage === 'number' ? `${basisPointsToPercent(slippage).toFixed(2)}%` : slippage}
+                {typeof slippage === 'number' ? `${basisPointsToPercent(slippage).toFixed(7)}%` : slippage}
               </TertiaryButton>
             </div>
             {(isRiskyLow || isRiskyHigh) && tooltipVisible && tooltip}

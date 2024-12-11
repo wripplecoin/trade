@@ -69,9 +69,9 @@ const SlippageSetting = () => {
   let slippageError: SlippageError | undefined
   if (slippageInput !== '' && !slippageInputIsValid) {
     slippageError = SlippageError.InvalidInput
-  } else if (slippageInputIsValid && userSlippageTolerance < 50) {
+  } else if (slippageInputIsValid && userSlippageTolerance < 700) {
     slippageError = SlippageError.RiskyLow
-  } else if (slippageInputIsValid && userSlippageTolerance > 500) {
+  } else if (slippageInputIsValid && userSlippageTolerance > 2000) {
     slippageError = SlippageError.RiskyHigh
   } else {
     slippageError = undefined
@@ -123,11 +123,11 @@ const SlippageSetting = () => {
           scale="sm"
           onClick={() => {
             setSlippageInput('')
-            setUserSlippageTolerance(50)
+            setUserSlippageTolerance(600)
           }}
-          variant={userSlippageTolerance === 50 ? 'primary' : 'tertiary'}
+          variant={userSlippageTolerance === 600 ? 'primary' : 'tertiary'}
         >
-          0.5%
+          6%
         </Button>
         <Button
           mr="4px"
@@ -158,7 +158,7 @@ const SlippageSetting = () => {
                 }
               }}
               isWarning={!slippageInputIsValid}
-              isSuccess={![10, 50, 100].includes(userSlippageTolerance)}
+              isSuccess={![10, 500, 600].includes(userSlippageTolerance)}
             />
           </Box>
           <Text color="primary" bold ml="2px">

@@ -3,9 +3,9 @@
  */
 const tokens = {
   cake: {
-    symbol: "CAKE",
+    symbol: "XRP",
     address: {
-      56: "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+      56: "0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE",
       97: "0xFa60D973F7642B748046464e165A65B7323b0DEE",
     },
     decimals: 18,
@@ -750,9 +750,9 @@ const tokens = {
     projectLink: "https://tether.to/",
   },
   btcb: {
-    symbol: "BTCB",
+    symbol: "wXRP",
     address: {
-      56: "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
+      56: "0xbbC9Fa4B395FeE68465C2Cd4a88cdE267a34ed2a",
       97: "0xE02dF9e3e622DeBdD69fb838bB799E3F168902c5",
     },
     decimals: 18,

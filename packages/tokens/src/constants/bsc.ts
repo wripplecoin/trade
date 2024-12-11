@@ -99,11 +99,11 @@ export const bscTokens = {
   usdt: USDT_BSC,
   btcb: new ERC20Token(
     ChainId.BSC,
-    '0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c',
+    '0xbbC9Fa4B395FeE68465C2Cd4a88cdE267a34ed2a',
     18,
-    'BTCB',
-    'Binance BTC',
-    'https://bitcoin.org/',
+    'wXRP',
+    'wRipple Token',
+    'https://wripple.net.org/',
   ),
   ust: new ERC20Token(
     ChainId.BSC,

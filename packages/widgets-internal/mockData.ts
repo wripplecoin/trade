@@ -1,13 +1,13 @@
-import { ERC20Token } from "@pancakeswap/sdk";
 import { ChainId } from "@pancakeswap/chains";
+import { ERC20Token } from "@pancakeswap/sdk";
 
 // For StoryBook
 export const cakeToken = new ERC20Token(
   ChainId.BSC,
-  "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+  "0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE",
   18,
-  "CAKE",
-  "PancakeSwap Token",
+  "wXRP",
+  "wRipple Coin",
   "https://pancakeswap.finance/"
 );
 

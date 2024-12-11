@@ -4,7 +4,6 @@ import { FlexGap } from '@pancakeswap/uikit'
 import { useUserSlippage } from '@pancakeswap/utils/user'
 import { SwapUIV2 } from '@pancakeswap/widgets-internal'
 import { useTokenRisk } from 'components/AccessRisk'
-import { RiskDetailsPanel, useShouldRiskPanelDisplay } from 'components/AccessRisk/SwapRevampRiskDisplay'
 import { useCurrency } from 'hooks/Tokens'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import { useCurrencyUsdPrice } from 'hooks/useCurrencyUsdPrice'
@@ -117,7 +116,7 @@ export function V4SwapForm() {
 
   const [userSlippageTolerance] = useUserSlippage()
   const isSlippageTooHigh = useMemo(() => userSlippageTolerance > 500, [userSlippageTolerance])
-  const shouldRiskPanelDisplay = useShouldRiskPanelDisplay(inputCurrency?.wrapped, outputCurrency?.wrapped)
+  // const shouldRiskPanelDisplay = useShouldRiskPanelDisplay(inputCurrency?.wrapped, outputCurrency?.wrapped)
   const token0Risk = useTokenRisk(inputCurrency?.wrapped)
   const token1Risk = useTokenRisk(outputCurrency?.wrapped)
 
@@ -136,16 +135,7 @@ export function V4SwapForm() {
         />
       </SwapUIV2.SwapTabAndInputPanelWrapper>
       {shouldShowBuyCrypto && <BuyCryptoPanel link={buyCryptoLink} />}
-      {(shouldRiskPanelDisplay || isPriceImpactTooHigh || isSlippageTooHigh) && (
-        <RiskDetailsPanel
-          isPriceImpactTooHigh={isPriceImpactTooHigh}
-          isSlippageTooHigh={isSlippageTooHigh}
-          token0={inputCurrency?.wrapped}
-          token1={outputCurrency?.wrapped}
-          token0RiskLevelDescription={token0Risk.data?.riskLevelDescription}
-          token1RiskLevelDescription={token1Risk.data?.riskLevelDescription}
-        />
-      )}
+
       <ButtonAndDetailsPanel
         swapCommitButton={
           <CommitButton order={bestOrder} tradeLoaded={tradeLoaded} tradeError={tradeError} {...commitHooks} />

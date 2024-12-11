@@ -200,14 +200,14 @@ describe('fetchFarmsV3', () => {
           "pid": 4,
           "poolWeight": "",
           "quoteToken": ERC20Token {
-            "address": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
+            "address": "0xbbC9Fa4B395FeE68465C2Cd4a88cdE267a34ed2a",
             "chainId": 56,
             "decimals": 18,
             "isNative": false,
             "isToken": true,
-            "name": "Binance BTC",
-            "projectLink": "https://bitcoin.org/",
-            "symbol": "BTCB",
+            "name": "wXRP BTC",
+            "projectLink": "https://wripple.net/",
+            "symbol": "wXRP",
           },
           "quoteTokenPriceBusd": "3000.000300000030000003",
           "token": ERC20Token {

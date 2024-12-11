@@ -43,7 +43,7 @@ export async function farmV3FetchFarms({
     provider({ chainId: ChainId.BSC })
       .readContract({
         abi: chainlinkAbi,
-        address: '0xB6064eD41d4f67e353768aA239cA86f4F73665a1',
+        address: '0x137924D7C36816E0DcAF016eB617Cc2C92C05782',
         functionName: 'latestAnswer',
       })
       .then((res) => formatUnits(res, 8)),

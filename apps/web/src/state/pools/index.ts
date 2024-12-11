@@ -23,16 +23,16 @@ import {
   isLegacyPool,
 } from '@pancakeswap/pools'
 import { getCurrencyUsdPrice } from '@pancakeswap/price-api-sdk'
-import { bscTokens } from '@pancakeswap/tokens'
 import { BIG_ZERO } from '@pancakeswap/utils/bigNumber'
 import { getBalanceNumber } from '@pancakeswap/utils/formatBalance'
 import { PayloadAction, createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit'
+import axios from 'axios'
 import BigNumber from 'bignumber.js'
 import keyBy from 'lodash/keyBy'
 import orderBy from 'lodash/orderBy'
 
 import { getPoolsPriceHelperLpFiles } from 'config/constants/priceHelperLps'
-import { getCakePriceFromOracle } from 'hooks/useCakePrice'
+// import { getCakePriceFromOracle } from 'hooks/useCakePrice'
 import { farmV3ApiFetch } from 'state/farmsV3/hooks'
 import {
   PoolsState,
@@ -47,8 +47,7 @@ import {
 import { safeGetAddress } from 'utils'
 import { fetchTokenAplPrice, isAlpToken } from 'utils/fetchTokenAplPrice'
 import { getViemClients } from 'utils/viem'
-import { publicClient } from 'utils/wagmi'
-import { Address, erc20Abi } from 'viem'
+import { Address } from 'viem'
 
 import fetchFarms from '../farms/fetchFarms'
 import { nativeStableLpMap } from '../farms/getFarmsPrices'
@@ -96,6 +95,19 @@ const initialState: PoolsState = {
   cakeFlexibleSideVault: initialPoolVaultState as any,
 }
 
+async function getCakePriceFromOracle() {
+  try {
+    const response = await axios.get(
+      'https://api.dexscreener.com/latest/dex/pairs/bsc/0xeeA18A4885D4119f1cdbDcD0E33A20Bd738C10fB',
+    ) // Địa chỉ LP của cặp CAKE/BNB trên PancakeSwap
+    const cakePrice = response.data.pair.priceUsd // Lấy giá của CAKE tính bằng USD
+    return cakePrice // Trả giá của CAKE
+  } catch (error) {
+    console.error('Error fetching cake price:', error)
+    return '0' // Nếu có lỗi, trả về giá 0
+  }
+}
+
 export const fetchCakePoolPublicDataAsync = () => async (dispatch) => {
   const cakePrice = parseFloat(await getCakePriceFromOracle())
 
@@ -113,38 +125,38 @@ export const fetchCakePoolPublicDataAsync = () => async (dispatch) => {
   )
 }
 
-export const fetchCakePoolUserDataAsync =
-  ({ account, chainId }: { account: string; chainId: ChainId }) =>
-  async (dispatch) => {
-    const client = publicClient({ chainId: ChainId.BSC })
-    const [allowance, stakingTokenBalance] = await client.multicall({
-      contracts: [
-        {
-          abi: erc20Abi,
-          address: bscTokens.cake.address,
-          functionName: 'allowance',
-          args: [account as Address, getCakeVaultAddress(chainId)],
-        },
-        {
-          abi: erc20Abi,
-          address: bscTokens.cake.address,
-          functionName: 'balanceOf',
-          args: [account as Address],
-        },
-      ],
-      allowFailure: false,
-    })
+// export const fetchCakePoolUserDataAsync =
+//   ({ account, chainId }: { account: string; chainId: ChainId }) =>
+//   async (dispatch) => {
+//     const client = publicClient({ chainId: ChainId.BSC })
+//     const [allowance, stakingTokenBalance] = await client.multicall({
+//       contracts: [
+//         {
+//           abi: erc20Abi,
+//           address: bscTokens.cake.address,
+//           functionName: 'allowance',
+//           args: [account as Address, getCakeVaultAddress(chainId)],
+//         },
+//         {
+//           abi: erc20Abi,
+//           address: bscTokens.cake.address,
+//           functionName: 'balanceOf',
+//           args: [account as Address],
+//         },
+//       ],
+//       allowFailure: false,
+//     })
 
-    dispatch(
-      setPoolUserData({
-        sousId: 0,
-        data: {
-          allowance: new BigNumber(allowance.toString()).toJSON(),
-          stakingTokenBalance: new BigNumber(stakingTokenBalance.toString()).toJSON(),
-        },
-      }),
-    )
-  }
+//     dispatch(
+//       setPoolUserData({
+//         sousId: 0,
+//         data: {
+//           allowance: new BigNumber(allowance.toString()).toJSON(),
+//           stakingTokenBalance: new BigNumber(stakingTokenBalance.toString()).toJSON(),
+//         },
+//       }),
+//     )
+//   }
 
 export const fetchPoolsPublicDataAsync = (chainId: number) => async (dispatch, getState) => {
   try {
