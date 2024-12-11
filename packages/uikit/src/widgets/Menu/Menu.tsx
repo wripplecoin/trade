@@ -12,7 +12,6 @@ import LangSelector from "../../components/LangSelector/LangSelector";
 import MenuItems from "../../components/MenuItems/MenuItems";
 import { SubMenuItems } from "../../components/SubMenuItems";
 import { useMatchBreakpoints } from "../../contexts";
-import Logo from "./components/Logo";
 import { MENU_HEIGHT, MOBILE_MENU_HEIGHT, TOP_BANNER_HEIGHT, TOP_BANNER_HEIGHT_MOBILE } from "./config";
 import { MenuContext } from "./context";
 import { NavProps } from "./types";
@@ -150,7 +149,16 @@ const Menu: React.FC<React.PropsWithChildren<NavProps>> = ({
             {banner && isMounted && <TopBannerContainer height={topBannerHeight}>{banner}</TopBannerContainer>}
             <StyledNav>
               <Flex>
-                {logoComponent ?? <Logo href={homeLink?.href ?? "/mev"} />}
+                <a href="/mev" style={{ display: "inline-block" }}>
+                  <img
+                    src="http://wripple.net/static/img/wripple-logo-black.svg"
+                    alt="Wripple Logo"
+                    style={{
+                      height: "50px",
+                      objectFit: "contain",
+                    }}
+                  />
+                </a>
                 <AtomBox display={{ xs: "none", lg: "block" }}>
                   <MenuItems
                     ml="24px"

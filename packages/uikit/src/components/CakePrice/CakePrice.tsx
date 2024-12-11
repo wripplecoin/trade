@@ -2,7 +2,6 @@ import React from "react";
 import { styled } from "styled-components";
 import { Colors } from "../../theme";
 import Skeleton from "../Skeleton/Skeleton";
-import LogoRound from "../Svg/Icons/LogoRound";
 import Text from "../Text/Text";
 
 export interface Props {
@@ -36,7 +35,13 @@ const CakePrice: React.FC<React.PropsWithChildren<Props>> = ({
       href={`https://pancakeswap.finance/swap?outputCurrency=0xbbC9Fa4B395FeE68465C2Cd4a88cdE267a34ed2a&chainId=${chainId}`}
       target="_blank"
     >
-      <LogoRound width="24px" mr="8px" />
+      {/* Thay LogoRound bằng logo wripple */}
+      <img
+        src="http://wripple.net/static/img/xrp.png"
+        alt="Wripple Logo"
+        width="30px"
+        style={{ marginRight: "8px", verticalAlign: "middle" }}
+      />
       <Text color={color} bold>{`$${cakePriceUsd.toFixed(3)}`}</Text>
     </PriceLink>
   ) : showSkeleton ? (

@@ -120,13 +120,13 @@ export const TwitterCards: React.FC = () => {
       </LogoBox>
       <Flex alignItems="center">
         <Text mt="10px" fontSize={14} bold>
-          PancakeSwap🥞Ev3ryone&#39;s Favourite D3X
+          wRipple🥞Ev3ryone&#39;s Favourite D3X
         </Text>
         <VerifiedIcon ml="3px" mt="9px" color={theme.colors.secondary} />
       </Flex>
       <Flex style={{ gap: 0 }} alignItems="center" justifyContent="center">
         <StyledText fontSize={14} color={theme.colors.textSubtle}>
-          @PancakeSwap
+          @wRipple.net
         </StyledText>
         <Divider />
         <Text fontSize={14} color={theme.colors.textSubtle}>
