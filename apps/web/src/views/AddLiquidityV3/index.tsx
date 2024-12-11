@@ -423,7 +423,7 @@ export function AddLiquidityV3Layout({
     <BodyWrapper mb={isMobile ? '40px' : '0px'}>
       <AppHeader
         title={title}
-        backTo="/liquidity/positions"
+        backTo="/"
         IconSlot={
           <>
             {selectType === SELECTOR_TYPE.V3 && <AprCalculatorV2 derived pool={pool} inverted={inverted} />}
